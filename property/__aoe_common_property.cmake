@@ -9,6 +9,7 @@
 #   | CHECK        [<value> ...]
 #   | CHECK_STATUS <result>
 #   | GET          <result>
+#   | UNSET
 #   >
 # )
 #
@@ -32,6 +33,9 @@
 #
 # GET: 获取指定属性的值，并写入到指定变量中。
 #      Take values of the property.
+#
+# UNSET: 将指定属性的值清空。
+#        Set empty value to the property.
 # --------------------------------------------------------------------------------------------------------------
 
 function(__aoe_common_property property)

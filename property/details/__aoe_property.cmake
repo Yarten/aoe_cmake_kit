@@ -10,6 +10,7 @@
 #   | CHECK        [<value> ...]
 #   | CHECK_STATUS <result>
 #   | GET          <result>
+#   | UNSET
 #   >
 # )
 #
@@ -39,15 +40,18 @@
 #
 # GET: 获取指定属性的值，并写入到指定变量中。
 #      Take values of the property.
+#
+# UNSET: 将指定属性的值清空。
+#        Set empty value to the property.
 # --------------------------------------------------------------------------------------------------------------
 
 macro(__aoe_property type property)
     # 解析可选参数
-    cmake_parse_arguments(config "" "INSTANCE;CHECK_STATUS;GET" "SET;APPEND;REMOVE;CHECK" ${ARGN})
+    cmake_parse_arguments(config "UNSET" "INSTANCE;CHECK_STATUS;GET" "SET;APPEND;REMOVE;CHECK" ${ARGN})
     aoe_disable_unknown_params(config)
 
     # 只允许执行一种操作
-    aoe_expect_one_of_params(config SET APPEND REMOVE CHECK GET)
+    aoe_expect_one_of_params(config UNSET SET APPEND REMOVE CHECK GET)
 
     # 若给定了 CHECK 参数，却没有给定 CHECK_STATUS 参数，则报错
     aoe_expect_related_param(config CHECK CHECK_STATUS)
@@ -99,6 +103,11 @@ macro(__aoe_property type property)
     # 若设置了 GET 参数，则获取该属性值
     if (DEFINED config_GET)
         aoe_output(${config_GET} ${__property_content})
+    endif ()
+
+    # 若设置了 UNSET 参数，则清空属性值
+    if (${config_UNSET})
+        set(__property_content "")
     endif ()
 
     # 更新属性值，并删除临时变量

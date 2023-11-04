@@ -31,6 +31,9 @@ endfunction()
 
 # 加载所有的 cmake 文件
 aoe_include_cmake_files(
-    ${CMAKE_CURRENT_LIST_DIR}/param
     ${CMAKE_CURRENT_LIST_DIR}/utils
+    ${CMAKE_CURRENT_LIST_DIR}/collection
+    ${CMAKE_CURRENT_LIST_DIR}/layout
+    ${CMAKE_CURRENT_LIST_DIR}/param
+    ${CMAKE_CURRENT_LIST_DIR}/property
 )
