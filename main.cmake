@@ -36,4 +36,8 @@ aoe_include_cmake_files(
     ${CMAKE_CURRENT_LIST_DIR}/layout
     ${CMAKE_CURRENT_LIST_DIR}/param
     ${CMAKE_CURRENT_LIST_DIR}/property
+    ${CMAKE_CURRENT_LIST_DIR}/ros
 )
+
+# 设置模板文件目录、脚本文件目录
+__aoe_common_property(SCRIPT_DIRECTORY_PATH SET "${CMAKE_CURRENT_LIST_DIR}/script")

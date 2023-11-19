@@ -8,7 +8,7 @@
 #   | APPEND       [<value> ...]
 #   | REMOVE       [<value> ...]
 #   | CHECK        [<value> ...]
-#   | CHECK_STATUS <result>
+#     CHECK_STATUS <result>
 #   | GET          <result>
 #   | UNSET
 #   >

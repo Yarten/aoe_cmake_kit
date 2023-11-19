@@ -85,9 +85,7 @@ __aoe_register_properties(COMMON
 
 __aoe_register_properties(PROJECT
     VERSION_NAME
-    ROS_PACKAGES
-    ROS_GLOBAL_USED
-    ROS2_INTERFACE_DEFINED
+    ROS_VERSION
     TARGETS
     PROTOBUF_TARGETS
     INSTALL_LAYOUT
