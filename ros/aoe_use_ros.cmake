@@ -18,7 +18,7 @@
 # --------------------------------------------------------------------------------------------------------------
 # aoe_use_ros(target
 #   < AS_IS
-#     [IMPORTS <other ros package> ...]
+#     [IMPORT <other ros package> ...]
 #   | AT <path>
 #   >
 #   < VERSION             <number>
@@ -34,8 +34,8 @@
 # AS_IS: 选择将本工程作为 ros package 使用。
 #        Choose to use this project as a ros package.
 #
-# IMPORTS: AS_IS 模式下，需要被导入的其他 ros package.
-#          Other ros packages to be imported in AS_IS mode.
+# IMPORT: AS_IS 模式下，需要被导入的其他 ros package.
+#         Other ros packages to be imported in AS_IS mode.
 #
 # AT: 初始化一个给定目录为 ros 工作空间，并将其挂载到本工程下。
 #
@@ -53,7 +53,7 @@
 
 macro(aoe_use_ros target)
     # 解析参数
-    cmake_parse_arguments(__aoe_use_ros_config "AS_IS;VERSION_FROM_ENV" "AT;VERSION;VERSION_FROM_ENV_OR" "IMPORTS" ${ARGN})
+    cmake_parse_arguments(__aoe_use_ros_config "AS_IS;VERSION_FROM_ENV" "AT;VERSION;VERSION_FROM_ENV_OR" "IMPORT" ${ARGN})
     aoe_disable_unknown_params(__aoe_use_ros_config)
     aoe_expect_one_of_params(__aoe_use_ros_config AS_IS AT)
     aoe_expect_one_of_params(__aoe_use_ros_config VERSION VERSION_FROM_ENV VERSION_FROM_ENV_OR)
@@ -76,7 +76,7 @@ macro(aoe_use_ros target)
     
     # 根据参数，选择不同的使用方式
     if (${__aoe_use_ros_config_AS_IS})
-        __aoe_use_ros_as_is(${target} ${__aoe_use_ros_config_VERSION} ${__aoe_use_ros_config_IMPORTS})
+        __aoe_use_ros_as_is(${target} ${__aoe_use_ros_config_VERSION} ${__aoe_use_ros_config_IMPORT})
     else ()
         __aoe_use_ros_at(${target} ${__aoe_use_ros_config_AT} ${__aoe_use_ros_config_VERSION})
     endif ()
