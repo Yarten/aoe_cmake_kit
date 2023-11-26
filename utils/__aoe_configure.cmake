@@ -14,7 +14,7 @@
 # 为了本函数的参数的名称、临时变量的名称，与调用处的上下文变量雷同，因此我们加了一些前缀。
 function(__aoe_configure __aoe_configure_result __aoe_configure_expr)
     # 临时的文件路径
-    set(__aoe_configure_temp_out_file "${CMAKE_BINARY_DIR}/.aoe/__aoe_configure.cmake")
+    set(__aoe_configure_temp_out_file "${CMAKE_BINARY_DIR}/.aoe/${PROJECT_NAME}/__aoe_configure.cmake")
     set(__aoe_configure_temp_in_file  "${__aoe_configure_temp_in_file}.in")
 
     # 将变量表达式写入到输入文件中

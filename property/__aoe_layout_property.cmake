@@ -44,3 +44,12 @@
 function(__aoe_layout_property layout property)
     __aoe_property(LAYOUT ${property} INSTANCE ${layout} ${ARGN})
 endfunction()
+
+# --------------------------------------------------------------------------------------------------------------
+# A useful wrapper for getting the current used layout's property.
+# --------------------------------------------------------------------------------------------------------------
+
+macro(__aoe_current_layout_property property)
+    __aoe_project_property(TARGET_LAYOUT GET __aoe_current_layout_property_current_layout)
+    __aoe_layout_property(${__aoe_current_layout_property_current_layout} ${property} ${ARGN})
+endmacro()

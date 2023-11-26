@@ -107,7 +107,6 @@ __aoe_register_properties(TARGET
     DEPENDENCIES
     THIRD_PARTIES
     THIRD_PARTIES_COMPONENTS
-    TARGET_NAME_FOR_CMAKE
 )
 
 # --------------------------------------------------------------------------------------------------------------

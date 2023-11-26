@@ -40,4 +40,5 @@ aoe_include_cmake_files(
 )
 
 # 设置模板文件目录、脚本文件目录
-__aoe_common_property(SCRIPT_DIRECTORY_PATH SET "${CMAKE_CURRENT_LIST_DIR}/script")
+__aoe_common_property(TEMPLATE_DIRECTORY_PATH SET "${CMAKE_CURRENT_LIST_DIR}/template")
+__aoe_common_property(SCRIPT_DIRECTORY_PATH   SET "${CMAKE_CURRENT_LIST_DIR}/script")

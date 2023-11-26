@@ -34,7 +34,7 @@ macro(__aoe_use_ros_at target path version)
         )
 
         # 设置 catkin 生成目录
-        set(CATKIN_DEVEL_PREFIX "${CMAKE_BINARY_DIR}/.aoe/ros1/devel")
+        set(CATKIN_DEVEL_PREFIX "${CMAKE_BINARY_DIR}/.aoe/${PROJECT_NAME}/ros1/devel")
 
         # 将生成的头文件目录，记录到接口目标中
         target_include_directories(${target} INTERFACE "${CATKIN_DEVEL_PREFIX}/include")
