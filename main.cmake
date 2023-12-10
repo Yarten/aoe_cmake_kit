@@ -37,6 +37,10 @@ aoe_include_cmake_files(
     ${CMAKE_CURRENT_LIST_DIR}/param
     ${CMAKE_CURRENT_LIST_DIR}/property
     ${CMAKE_CURRENT_LIST_DIR}/ros
+    ${CMAKE_CURRENT_LIST_DIR}/target
+    ${CMAKE_CURRENT_LIST_DIR}/project
+    ${CMAKE_CURRENT_LIST_DIR}/init
+    ${CMAKE_CURRENT_LIST_DIR}/final
 )
 
 # 设置模板文件目录、脚本文件目录

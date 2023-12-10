@@ -47,7 +47,7 @@
 
 macro(__aoe_property type property)
     # 解析可选参数
-    cmake_parse_arguments(config "UNSET" "INSTANCE;CHECK_STATUS;GET" "SET;APPEND;REMOVE;CHECK" ${ARGN})
+    __aeo_cmake_parse_nullable_arguments(config "UNSET" "INSTANCE;CHECK_STATUS;GET" "SET;APPEND;REMOVE;CHECK" ${ARGN})
     aoe_disable_unknown_params(config)
 
     # 只允许执行一种操作
@@ -86,12 +86,10 @@ macro(__aoe_property type property)
 
         # 遍历所有需要检查的值，逐一查找，只要有一个值不存在，则认为检查失败
         foreach (value ${config_CHECK})
-            list(FIND ${__property_content} ${value} ${config_CHECK_STATUS})
+            list(FIND __property_content ${value} __property_found_index)
 
-            if (${${config_CHECK_STATUS}} EQUAL -1)
+            if (${__property_found_index} EQUAL -1)
                 set(${config_CHECK_STATUS} False)
-            else()
-                set(${config_CHECK_STATUS} True)
                 break()
             endif()
         endforeach ()

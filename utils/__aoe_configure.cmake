@@ -29,6 +29,7 @@ function(__aoe_configure __aoe_configure_result __aoe_configure_expr)
 
     # 将输出文件的内容，读取到结果变量中
     file(READ "${__aoe_configure_temp_out_file}" __aoe_configure_value)
+    string(STRIP ${__aoe_configure_value} __aoe_configure_value)
     aoe_output(${__aoe_configure_result} ${__aoe_configure_value})
 
     # 删除临时文件

@@ -23,10 +23,10 @@
 function(__aoe_load_current_install_layout include lib bin cmake build)
     aoe_disable_extra_params()
 
-    __aoe_current_layout_property(INSTALL_INCLUDE include_)
-    __aoe_current_layout_property(INSTALL_LIB     lib_)
-    __aoe_current_layout_property(INSTALL_BIN     bin_)
-    __aoe_current_layout_property(INSTALL_CMAKE   cmake_)
+    __aoe_current_layout_property(INSTALL_INCLUDE GET include_)
+    __aoe_current_layout_property(INSTALL_LIB     GET lib_)
+    __aoe_current_layout_property(INSTALL_BIN     GET bin_)
+    __aoe_current_layout_property(INSTALL_CMAKE   GET cmake_)
 
     __aoe_configure(include_ ${include_})
     __aoe_configure(lib_     ${lib_})

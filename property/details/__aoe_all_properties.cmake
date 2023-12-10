@@ -76,6 +76,7 @@ endfunction()
 __aoe_register_properties(COMMON
     TEMPLATE_DIRECTORY_PATH
     SCRIPT_DIRECTORY_PATH
+    META_VERSION_NAME
 )
 
 # --------------------------------------------------------------------------------------------------------------
@@ -117,8 +118,6 @@ __aoe_register_properties(TARGET
 __aoe_register_properties(PROTOBUF
     SOURCE_DIRECTORIES
     DEPENDENCIES
-    THIRD_PARTIES
-    THIRD_PARTIES_COMPONENTS
     SHARED
 )
 

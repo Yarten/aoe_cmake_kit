@@ -36,7 +36,7 @@ macro(__aoe_add_target type)
         set(is_interface OFF)
     endif ()
 
-    macro(this_target_include_directories is_private)
+    macro(this_target_include_directories is_private items)
         if (${is_interface})
             set(option "INTERFACE")
         elseif (${is_private})
@@ -45,7 +45,7 @@ macro(__aoe_add_target type)
             set(option "PUBLIC")
         endif ()
 
-        foreach (dir ${ARGN})
+        foreach (dir ${items})
             if ("${dir}" MATCHES "^\\$<.*>$")
                 # 传入的是生成表达式，则只能直接使用它
                 target_include_directories(${target} ${option} "${dir}")
@@ -67,7 +67,7 @@ macro(__aoe_add_target type)
         endforeach ()
     endmacro()
 
-    macro(this_target_link_directories is_private)
+    macro(this_target_link_directories is_private items)
         if (${is_interface})
             set(option "INTERFACE")
         elseif (${is_private})
@@ -76,7 +76,7 @@ macro(__aoe_add_target type)
             set(option "PUBLIC")
         endif ()
 
-        target_link_directories(${target} ${option} ${ARGN})
+        target_link_libraries(${target} ${option} ${items})
     endmacro()
 
     # -------------------------------------------------------------
@@ -95,16 +95,25 @@ macro(__aoe_add_target type)
             # 无源码时，自动创建为接口库目标
             add_library(${target} INTERFACE)
         else ()
-            if (${config_SHARED} OR (${BUILD_SHARED_LIBS} AND NOT ${config_STATIC}))
+            if (DEFINED BUILD_SHARED_LIBS)
+                set(default_build_shared ${BUILD_SHARED_LIBS})
+            else ()
+                set(default_build_shared OFF)
+            endif ()
+
+            if (${config_SHARED} OR (${default_build_shared} AND NOT ${config_STATIC}))
                 add_library(${target} SHARED ${target_sources})
-                set_target_properties(${target} PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION})
+
+                if (DEFINED PROJECT_VERSION)
+                    set_target_properties(${target} PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION})
+                endif ()
             else ()
                 add_library(${target} STATIC ${target_sources})
             endif ()
         endif ()
 
         # 设置库的输出名字，需要加上命名空间（与组名），以防止被其他工程导入使用时，出现同名冲突
-        set(target_output_name ${PROJECT_NAME}_${name})
+        set(target_output_name ${PROJECT_NAME}_${target})
     else ()
         message(FATAL_ERROR "unknown target type (internal error): ${type}")
     endif ()
@@ -115,7 +124,7 @@ macro(__aoe_add_target type)
             set(target_output_name ${config_ALIAS})
         endif ()
 
-        aoe_message("OUTPUT NAME" ${target_output_name})
+        aoe_message("OUTPUT NAME" TAB ${target_output_name})
         set_target_properties(${target} PROPERTIES OUTPUT_NAME ${target_output_name})
     endif ()
 
@@ -148,8 +157,8 @@ macro(__aoe_add_target type)
     endif ()
 
     # 设置链接库
-    this_target_link_directories(OFF ${config_DEPEND})
-    this_target_link_directories(ON  ${config_PRIVATE_DEPEND})
+    this_target_link_directories(OFF "${config_DEPEND}")
+    this_target_link_directories(ON  "${config_PRIVATE_DEPEND}")
 
     # 处理强制链接
     list(REMOVE_DUPLICATES config_FORCE_DEPEND)
@@ -160,11 +169,7 @@ macro(__aoe_add_target type)
         endforeach ()
     elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         if (NOT "${config_FORCE_DEPEND}" STREQUAL "")
-            this_target_link_directories(ON
-                "-Wl,--whole-archive"
-                ${config_FORCE_DEPEND}
-                "-Wl,--no-whole-archive"
-            )
+            this_target_link_directories(ON "-Wl,--whole-archive;${config_FORCE_DEPEND};-Wl,--no-whole-archive")
         endif ()
     else ()
         message(FATAL_ERROR "CANNOT use FORCE_DEPEND with unsupported compiler ${CMAKE_CXX_COMPILER_ID} !")
@@ -179,21 +184,21 @@ macro(__aoe_add_target type)
     aoe_find_packages(${config_PRIVATE_IMPORT} AS private_imported COMPONENTS ${config_COMPONENTS})
 
     __aoe_target_property(${target} THIRD_PARTIES            SET ${config_IMPORT} ${config_PRIVATE_IMPORT})
-    __eon_target_property(${target} THIRD_PARTIES_COMPONENTS SET ${config_COMPONENTS})
+    __aoe_target_property(${target} THIRD_PARTIES_COMPONENTS SET ${config_COMPONENTS})
 
-    this_target_include_directories(OFF ${imported_INCLUDE_DIRS})
-    this_target_include_directories(ON  ${private_imported_INCLUDE_DIRS})
+    this_target_include_directories(OFF "${imported_INCLUDE_DIRS}")
+    this_target_include_directories(ON  "${private_imported_INCLUDE_DIRS}")
 
-    this_target_link_directories(OFF ${imported_LIBRARIES})
-    this_target_link_directories(ON  ${private_imported_LIBRARIES})
+    this_target_link_directories(OFF "${imported_LIBRARIES}")
+    this_target_link_directories(ON  "${private_imported_LIBRARIES}")
 
     # -------------------------------------------------------------
     # 设置给定的头文件目录与库目录
-    this_target_include_directories(OFF ${config_INCLUDES})
-    this_target_include_directories(ON  ${config_PRIVATE_INCLUDES})
+    this_target_include_directories(OFF "${config_INCLUDES}")
+    this_target_include_directories(ON  "${config_PRIVATE_INCLUDES}")
 
-    this_target_link_directories(OFF ${config_LIBARIES})
-    this_target_link_directories(ON  ${config_PRIVATE_LIBRARIES})
+    this_target_link_directories(OFF "${config_LIBARIES}")
+    this_target_link_directories(ON  "${config_PRIVATE_LIBRARIES}")
 
     # -------------------------------------------------------------
     # 配置 install

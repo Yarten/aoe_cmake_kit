@@ -38,20 +38,14 @@
 
 function(aoe_find_packages)
     # 解析第一层参数
-    cmake_parse_arguments(config "ROS" "AS;ROS_VERSION" "COMPONENTS" ${ARGN})
+    cmake_parse_arguments(config "" "AS" "COMPONENTS" ${ARGN})
     set(packages ${config_UNPARSED_ARGUMENTS})
 
     # 解析组件参数中的分组参数（按要求导入的第三方库名称作为分组依据）
     cmake_parse_arguments(components "" "" "${packages}" ${config_COMPONENTS})
 
-    if (${config_ROS})
-        set(config_ROS ROS)
-    else()
-        set(config_ROS)
-    endif ()
-
     foreach(package ${packages})
-        aoe_find_package(${package} ${config_ROS} ROS_VERSION ${config_ROS_VERSION} COMPONENTS ${components_${package}})
+        aoe_find_package(${package} COMPONENTS ${components_${package}})
     endforeach()
 
     # 若指定了 AS 参数，则将所有头文件目录、库文件路径总结在一起输出

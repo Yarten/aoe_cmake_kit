@@ -94,13 +94,17 @@ function(aoe_install_target target)
 
     # -------------------------------------------------------------
     # 生成版本文件
-    set(version_file_path "${build}/${target}ConfigVersion.cmake")
+    if (DEFINED PROJECT_VERSION)
+        set(version_file_path "${build}/${target}ConfigVersion.cmake")
 
-    include(CMakePackageConfigHelpers)
-    write_basic_package_version_file("${version_file_path}"
-        VERSION       ${PROJECT_VERSION}
-        COMPATIBILITY AnyNewerVersion
-    )
+        include(CMakePackageConfigHelpers)
+        write_basic_package_version_file("${version_file_path}"
+            VERSION       ${PROJECT_VERSION}
+            COMPATIBILITY AnyNewerVersion
+        )
+    else ()
+        unset(version_file_path)
+    endif ()
 
     # -------------------------------------------------------------
     # 生成配置文件（定义对工程内其他目标的依赖，以及对第三方库的依赖。）
@@ -117,8 +121,8 @@ function(aoe_install_target target)
     # -------------------------------------------------------------
     # 安装版本文件与配置文件
     install(
-        FILES       "${version_file_path}" "${config_file_path}"
-        DESTINATION "${cmake}"
+        FILES       ${version_file_path} ${config_file_path}
+        DESTINATION ${cmake}
         COMPONENT   Devel
     )
 

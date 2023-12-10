@@ -44,6 +44,7 @@ macro(__aoe_parse_target_arguments
             PRIVATE_LIBRARIES
         )
     else ()
+        set(${config_variable}_PRIVATE_DEFAULT_INCLUDES ON)
         list(APPEND __aoe_parse_target_arguments_optional_parameters
             AUX
         )

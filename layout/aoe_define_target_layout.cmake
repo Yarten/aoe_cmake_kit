@@ -83,11 +83,7 @@ function(aoe_define_target_layout name)
         endif ()
 
         # 记录布局选项
-        if ("${value}" STREQUAL "")
-            __aoe_layout_property(${name} TARGET_${option} UNSET)
-        else ()
-            __aoe_layout_property(${name} TARGET_${option} SET ${config_${option}})
-        endif ()
+        __aoe_layout_property(${name} TARGET_${option} SET ${config_${option}})
     endforeach ()
 
     # 追加本布局名称

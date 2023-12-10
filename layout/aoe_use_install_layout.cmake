@@ -15,7 +15,7 @@ function(aoe_use_install_layout name)
 
     if (NOT ${is_valid})
         __aoe_project_property(ALL_INSTALL_LAYOUTS GET all_install_layouts)
-        message(FATAL_ERROR "Undefined install layout ${name}! (only ${all_install_layouts} available)")
+        message(FATAL_ERROR "Undefined install layout [${name}]! (only [${all_install_layouts}] available)")
     endif ()
 
     __aoe_project_property(INSTALL_LAYOUT SET ${name})
