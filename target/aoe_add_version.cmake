@@ -17,7 +17,7 @@ function(aoe_add_version target include_pattern namespace)
     set(target_header_root "${target_root}/include/${include_pattern}")
 
     # 删除已经存在版本目标的全部内容，并重新创建
-    file(REMOVE         ${target_root})
+    file(REMOVE_RECURSE ${target_root})
     file(MAKE_DIRECTORY ${target_header_root})
 
     # 根据工程名称、版本号与版本名称、与命名空间等信息，生成版本目标的 cmake 文件与头文件
