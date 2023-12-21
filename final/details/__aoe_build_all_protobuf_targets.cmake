@@ -70,12 +70,6 @@ function(__aoe_build_all_protobuf_targets)
             "${target}" "${target_root}" "${proto_paths}" "${proto_files}"
         )
 
-        message("${script_directory_path}/generate_protobuf_package.bash \\")
-        message("${target} \\")
-        message("${target_root} \\")
-        message("${proto_paths} \\")
-        message("${proto_files}")
-
         # -------------------------------------------------------------
         # 设置该目标编译为动态库的选项
         __aoe_protobuf_property(${target} SHARED GET is_shared)

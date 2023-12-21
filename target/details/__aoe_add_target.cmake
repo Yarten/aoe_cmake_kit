@@ -89,11 +89,10 @@ macro(__aoe_add_target type)
         set(target_output_name ${target})
     elseif ("${type}" STREQUAL "library")
         # 创建为库目标
-        aoe_message("INTERFACE" TAB ${is_interface})
-
         if (${is_interface})
             # 无源码时，自动创建为接口库目标
             add_library(${target} INTERFACE)
+            aoe_message("INTERFACE" TAB MAYBE_EMPTY)
         else ()
             if (DEFINED BUILD_SHARED_LIBS)
                 set(default_build_shared ${BUILD_SHARED_LIBS})
@@ -204,6 +203,8 @@ macro(__aoe_add_target type)
     # 配置 install
     if (NOT ${config_NO_INSTALL})
         aoe_install_target(${target})
+    else ()
+        aoe_message("NO_INSTALL" TAG MAYBE_EMPTY)
     endif ()
 
     # END
