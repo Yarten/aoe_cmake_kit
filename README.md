@@ -4,7 +4,19 @@ Just some cmake tools for lazy people like me :)
 
 Examples and docs (not yet) can be found at [aoe cmake kit tutorial](https://github.com/Yarten/aoe_cmake_kit_tutorial).
 
-## Import the kit
+
+## Interesting Points
+
+- [x] Easy to use
+- [x] Wrap install() for targets
+- [x] Protobuf support
+- [x] ROS support
+- [x] Customizable default behaviors (target layout and install layout)
+- [ ] Project summary for feature extensions
+- [ ] Can be hooked everywhere
+
+
+## Import the Kit
 
 You can use the following codes to import this kit:
 
@@ -15,6 +27,7 @@ FetchContent_MakeAvailable(aoe_cmake_kit)
 FetchContent_GetProperties(aoe_cmake_kit SOURCE_DIR aoe_cmake_kit)
 include(${aoe_cmake_kit}/main.cmake)
 ```
+
 
 ## Simple Example
 
@@ -55,7 +68,7 @@ include(${aoe_cmake_kit}/main.cmake)
 
 # -------------------------------------------------------------
 # Create the aoe project
-aoe_project(NAME SimpleExample VERSION 1.2.3)
+aoe_project(NAME SimpleExample VERSION 1.2.3 VERSION_NAME banana)
 
 # -------------------------------------------------------------
 # Create a library target, an executable test target,
