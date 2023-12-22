@@ -37,7 +37,7 @@
 
 function(aoe_define_install_layout name)
     # 所有的可配置项及其默认值
-    aoe_list(options APPEND "INCLUDE" "include")
+    aoe_list(options APPEND "INCLUDE" ".")
     aoe_list(options APPEND "LIB"     "lib")
     aoe_list(options APPEND "BIN"     "bin")
     aoe_list(options APPEND "CMAKE"   "lib/cmake/@PROJECT_NAME@")
