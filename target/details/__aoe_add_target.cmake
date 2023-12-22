@@ -205,7 +205,7 @@ macro(__aoe_add_target type)
     if (NOT ${config_NO_INSTALL})
         aoe_install_target(${target})
     else ()
-        aoe_message("NO_INSTALL" TAG MAYBE_EMPTY)
+        aoe_message("NO_INSTALL" TAB MAYBE_EMPTY)
     endif ()
 
     # END
