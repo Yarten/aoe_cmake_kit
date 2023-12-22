@@ -51,4 +51,7 @@ function(aoe_project_complete)
         DEFAULT      ${config_DEFAULT_EXPORTS}
         MODULE_PATHS ${config_EXPORTED_MODULE_PATHS}
     )
+
+    # 总结本 aoe 工程所有信息，并输出到指定的环境变量指向的文件中（如果指定了的话）
+    __aoe_summarize_project()
 endfunction()

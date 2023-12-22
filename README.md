@@ -1,5 +1,7 @@
 # aoe_cmake_kit
 
+![build status](https://github.com/Yarten/aoe_cmake_kit_tutorial/actions/workflows/cmake-multi-platform.yml/badge.svg)
+
 Just some cmake tools for lazy people like me :)
 
 Examples and docs (not yet) can be found at [aoe cmake kit tutorial](https://github.com/Yarten/aoe_cmake_kit_tutorial).
@@ -12,7 +14,7 @@ Examples and docs (not yet) can be found at [aoe cmake kit tutorial](https://git
 - [x] Protobuf support
 - [x] ROS support
 - [x] Customizable default behaviors (target layout and install layout)
-- [ ] Project summary for feature extensions
+- [x] Project summary for feature extensions
 - [ ] Can be hooked everywhere
 
 

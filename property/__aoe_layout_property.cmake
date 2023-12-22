@@ -42,7 +42,7 @@
 # --------------------------------------------------------------------------------------------------------------
 
 function(__aoe_layout_property layout property)
-    __aoe_property(LAYOUT ${property} INSTANCE ${layout} ${ARGN})
+    __aoe_property(LAYOUT ${property} INSTANCE ${PROJECT_NAME}-${layout} ${ARGN})
 endfunction()
 
 # --------------------------------------------------------------------------------------------------------------

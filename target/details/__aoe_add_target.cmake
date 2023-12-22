@@ -82,6 +82,7 @@ macro(__aoe_add_target type)
     # -------------------------------------------------------------
     # 创建目标
     aoe_message("TARGET" ${target})
+    __aoe_project_property(TARGETS APPEND ${target})
 
     if ("${type}" STREQUAL "executable")
         # 创建为可执行目标
