@@ -1,6 +1,6 @@
 # aoe_cmake_kit
 
-![build status](https://github.com/Yarten/aoe_cmake_kit_tutorial/actions/workflows/cmake-multi-platform.yml/badge.svg)
+![build status](https://github.com/Yarten/aoe_cmake_kit_tutorial/actions/workflows/cmake-ubuntu-multi-compiler.yml/badge.svg)
 
 Just some cmake tools for lazy people like me :)
 
