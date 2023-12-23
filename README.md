@@ -26,8 +26,6 @@ You can use the following codes to import this kit:
 include(FetchContent)
 FetchContent_Declare(aoe_cmake_kit GIT_REPOSITORY https://github.com/Yarten/aoe_cmake_kit.git GIT_TAG main)
 FetchContent_MakeAvailable(aoe_cmake_kit)
-FetchContent_GetProperties(aoe_cmake_kit SOURCE_DIR aoe_cmake_kit)
-include(${aoe_cmake_kit}/main.cmake)
 ```
 
 
@@ -65,8 +63,6 @@ cmake_minimum_required(VERSION 3.16)
 include(FetchContent)
 FetchContent_Declare(aoe_cmake_kit GIT_REPOSITORY https://github.com/Yarten/aoe_cmake_kit.git GIT_TAG main)
 FetchContent_MakeAvailable(aoe_cmake_kit)
-FetchContent_GetProperties(aoe_cmake_kit SOURCE_DIR aoe_cmake_kit)
-include(${aoe_cmake_kit}/main.cmake)
 
 # -------------------------------------------------------------
 # Create the aoe project
