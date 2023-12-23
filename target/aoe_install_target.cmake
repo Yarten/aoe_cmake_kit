@@ -38,7 +38,7 @@ function(aoe_install_target target)
     # If this target is executable, we stop here.
     get_target_property(target_type ${target} TYPE)
 
-    if (${target_type} STREQUAL "EXECUTABLE")
+    if ("${target_type}" STREQUAL "EXECUTABLE")
         return()
     endif ()
 
