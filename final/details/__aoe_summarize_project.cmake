@@ -5,7 +5,7 @@
 # all the information of this project will be output to the file specified by this variable.
 # The format of the output is determined by the suffix of the path.
 #
-# Support style: xml, json, yaml/yml
+# Support style: xml, json, yaml/yml, toml
 # --------------------------------------------------------------------------------------------------------------
 
 function(__aoe_summarize_project)
@@ -13,10 +13,12 @@ function(__aoe_summarize_project)
         return()
     endif ()
 
-    # 从环境变量中，取出总结文件的输出路径
+    # Take the output summary file path from the environment variable,
+    # user can use @PROJECT_NAME@ to distinguish the output of different projects.
     __aoe_configure(summary_file_path "$ENV{AOE_CMAKE_KIT_SUMMARY}")
 
-    # 从该文件的后缀，决定总结输出的格式
+    # Determine the output format based on the suffix of the path,
+    # the 'style' variable will be used in all later write marcos.
     get_filename_component(style "${summary_file_path}" LAST_EXT)
 
     if ("${style}" STREQUAL ".xml")
@@ -25,24 +27,27 @@ function(__aoe_summarize_project)
         set(style "json")
     elseif ("${style}" STREQUAL ".yaml" OR "${style}" STREQUAL ".yml")
         set(style "yaml")
+    elseif ("${style}" STREQUAL ".toml")
+        set(style "toml")
     else ()
         message(FATAL_ERROR "Unknown style for aoe cmake kit summary: [${summary_file_path}]")
     endif ()
 
-    # 准备输出的字符串，它将在后续的所有总结函数中使用
+    # Prepare a variable for setting the content of the output,
+    # it will be used in all later write macros.
     set(out_str "")
 
-    # 开始构建总结
+    # Write the begin of the summary
     __aoe_write_summary_begin()
 
-    # 写入一些重要的 cmake 变量
+    # Write some important cmake variables
     __aoe_summarize_cmake_variables("PROJECT_NAME;PROJECT_VERSION")
 
-    # 写入全局属性
+    # Write the aoe global properties defined in this project
     __aoe_summarize_global_properties("COMMON")
     __aoe_summarize_global_properties("PROJECT")
 
-    # 写入各种实例属性
+    # Write the aoe instances' properties defined in this project
     __aoe_project_property(TARGETS GET target_instances)
     __aoe_summarize_instance_properties("TARGET" "${target_instances}" "")
 
@@ -56,13 +61,14 @@ function(__aoe_summarize_project)
 
     __aoe_summarize_instance_properties("LAYOUT" "${layout_instances}" "")
 
-    # 结束构建总结
+    # Write the end of the summary
     __aoe_write_summary_end()
 
-    # 将总结内容写入到指定文件路径下
+    # Write the summary content to the specified file
     file(WRITE "${summary_file_path}" "${out_str}")
 
-    # 由于总结宏里边，可能会导出 values 变量，我们在此拦截掉它
+    # Unset the variables that may be propagated to the parent scope
+    # because of the use of some internal marcos.
     unset(values)
 endfunction()
 
@@ -97,7 +103,8 @@ macro(__aoe_summarize_global_properties type)
         unset(values)
 
         if ("${type}" STREQUAL "PROJECT")
-            # PROJECT 属性比较特殊，虽然是全局属性，但仅在工程内全局
+            # The PROJECT properties have been bind to ${PROJECT_NAME} instance,
+            # that's why we're specializing here.
             __aoe_project_property(${property} GET values)
         else ()
             __aoe_property(${type} ${property} GET values)
@@ -117,7 +124,7 @@ endmacro()
 # --------------------------------------------------------------------------------------------------------------
 
 macro(__aoe_summarize_instance_properties type instances extra_target_properties)
-    # aoe 的属性
+    # Get aoe properties of the given ${type}
     __aoe_all_properties(properties ${type})
 
     __aoe_write_summary_key_begin(1 ${type} OFF)
@@ -125,7 +132,7 @@ macro(__aoe_summarize_instance_properties type instances extra_target_properties
     foreach (instance ${instances})
         __aoe_write_summary_key_begin(2 ${instance} OFF)
 
-        # 写入 aoe 的属性
+        # Write the aoe properties
         foreach (property ${properties})
             __aoe_write_summary_key_begin(3 ${property} ON)
 
@@ -136,7 +143,7 @@ macro(__aoe_summarize_instance_properties type instances extra_target_properties
             __aoe_write_summary_key_end(3 ${property} ON)
         endforeach ()
 
-        # 写入 cmake 的属性（目前仅支持 TARGET 的）
+        # Write the cmake properties (only TARGET properties are supported)
         foreach (property ${extra_target_properties})
             __aoe_write_summary_key_begin(3 ${property} ON)
 
@@ -159,27 +166,30 @@ endmacro()
 # --------------------------------------------------------------------------------------------------------------
 
 macro(__aoe_write_summary_begin)
+    set(str "")
+
     if ("${style}" STREQUAL "xml")
         set(str "<aoe-cmake-kit-summary>")
     elseif ("${style}" STREQUAL "json")
         set(str "{")
     elseif ("${style}" STREQUAL "yaml")
         set(str "aoe-cmake-kit-summary:")
-    else ()
-        set(str "")
     endif ()
 
     string(APPEND out_str "${str}")
+
+    # Use a stack to store the keys path formed along the levels
+    set(keys "")
 endmacro()
 
 
 macro(__aoe_write_summary_end)
+    set(str "")
+
     if ("${style}" STREQUAL "xml")
         set(str "</aoe-cmake-kit-summary>")
     elseif ("${style}" STREQUAL "json")
         set(str "}")
-    else ()
-        set(str "")
     endif ()
 
     string(APPEND out_str "\n${str}\n")
@@ -191,19 +201,26 @@ endmacro()
 # --------------------------------------------------------------------------------------------------------------
 
 macro(__aoe_write_summary_key_begin level key is_leaf)
-    # 检查本项是否为本层级的中间项，如果是，则加分隔符
+    # Check if this item is an intermediate item in this level, and if so, add a separator
     if (NOT DEFINED is_middle_at_level_${level})
         set(is_middle_at_level_${level} ON)
     else ()
-        __aoe_write_summary_separator()
+        __aoe_write_summary_separator(OFF)
     endif ()
 
-    # 将下一个层级的“是否在中间”的标志重置，确保下一个层级的第一项之前不会加分隔符
+    # Unset the "is it in the middle" flag of the next level
+    # to ensure that the first item of the next level is not preceded by a separator
     math(EXPR next_level "${level} + 1")
     unset(is_middle_at_level_${next_level})
 
+    set(old_keys ${keys})
+    list(APPEND keys ${key})
+    set(is_tree_like ON)
+    set(str "")
+
     if ("${style}" STREQUAL "xml")
         set(str "<prop key=\"${key}\">")
+
     elseif ("${style}" STREQUAL "json")
         set(str "\"${key}\": ")
         if (${is_leaf})
@@ -211,32 +228,76 @@ macro(__aoe_write_summary_key_begin level key is_leaf)
         else ()
             set(str "${str}{")
         endif ()
+
     elseif ("${style}" STREQUAL "yaml")
         set(str "${key}:")
-    else ()
-        set(str "")
+
+    elseif ("${style}" STREQUAL "toml")
+        set(is_tree_like OFF)
+
+        if (${is_leaf})
+            # Ensure all toml values from the same property share one table
+            if (NOT DEFINED at_toml_leaf)
+                set(at_toml_leaf ON)
+
+                string(APPEND out_str "[")
+                set(is_first ON)
+
+                foreach (i ${old_keys})
+                    if (${is_first})
+                        set(is_first OFF)
+                    else ()
+                        string(APPEND out_str ".")
+                    endif ()
+                    string(APPEND out_str "\"${i}\"")
+                endforeach ()
+
+                string(APPEND out_str "]\n\n")
+            endif ()
+
+            string(APPEND out_str "\"${key}\" = [")
+        endif ()
+
     endif ()
 
-    string(REPEAT "  " ${level} tabs)
-    string(APPEND out_str "\n${tabs}${str}")
+    if (${is_tree_like})
+        string(REPEAT "  " ${level} tabs)
+        string(APPEND out_str "\n${tabs}${str}")
+    endif ()
 endmacro()
 
 
 macro(__aoe_write_summary_key_end level key is_leaf)
+    set(old_keys ${keys})
+    list(POP_BACK keys)
+    set(is_tree_like ON)
+    set(str "")
+
     if ("${style}" STREQUAL "xml")
         set(str "</prop>")
+
     elseif ("${style}" STREQUAL "json")
         if (${is_leaf})
             set(str "]")
         else ()
             set(str "}")
         endif ()
-    else ()
-        set(str "")
+
+    elseif ("${style}" STREQUAL "toml")
+        set(is_tree_like OFF)
+        if (${is_leaf})
+            string(APPEND out_str "\n]\n\n")
+        else ()
+            # Ensure the next property create a new toml table
+            unset(at_toml_leaf)
+        endif ()
+
     endif ()
 
-    string(REPEAT "  " ${level} tabs)
-    string(APPEND out_str "\n${tabs}${str}")
+    if (${is_tree_like})
+        string(REPEAT "  " ${level} tabs)
+        string(APPEND out_str "\n${tabs}${str}")
+    endif ()
 endmacro()
 
 
@@ -250,7 +311,7 @@ macro(__aoe_write_summary_values level values)
         if (${is_first})
             set(is_first OFF)
         else ()
-            __aoe_write_summary_separator()
+            __aoe_write_summary_separator(ON)
         endif ()
 
         __aoe_write_summary_value(${level} ${value})
@@ -259,26 +320,40 @@ endmacro()
 
 
 macro(__aoe_write_summary_value level value)
+    set(is_tree_like ON)
+    set(str "")
+
     if ("${style}" STREQUAL "xml")
         set(str "<value>${value}</value>")
+
     elseif ("${style}" STREQUAL "json")
         set(str "\"${value}\"")
+
     elseif ("${style}" STREQUAL "yaml")
         set(str "- ${value}")
-    else ()
-        set(str "")
+
+    elseif ("${style}" STREQUAL "toml")
+        set(is_tree_like OFF)
+        string(APPEND out_str "\n  \"${value}\"")
+
     endif ()
 
-    string(REPEAT "  " ${level} tabs)
-    string(APPEND out_str "\n${tabs}${str}")
+    if (${is_tree_like})
+        string(REPEAT "  " ${level} tabs)
+        string(APPEND out_str "\n${tabs}${str}")
+    endif ()
 endmacro()
 
 
-macro(__aoe_write_summary_separator)
+macro(__aoe_write_summary_separator is_between_values)
+    set(str "")
+
     if ("${style}" STREQUAL "json")
         set(str ",")
-    else ()
-        set(str "")
+    elseif ("${style}" STREQUAL "toml")
+        if (${is_between_values})
+            set(str ",")
+        endif ()
     endif ()
 
     string(APPEND out_str "${str}")
