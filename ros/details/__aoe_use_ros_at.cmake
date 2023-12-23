@@ -16,44 +16,43 @@
 
 macro(__aoe_use_ros_at target path version)
     # -------------------------------------------------------------
-    # 缓存 BUILD_SHARED_LIBS 选项，ros 1 的导入可能改变它
+    # Cache the BUILD_SHARED_LIBS option, because ros 1 may change it.
     set(__aoe_use_ros_at_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 
-    # 获取脚本目录
+    # Get script directory
     __aoe_common_property(SCRIPT_DIRECTORY_PATH GET __aoe_use_ros_script_root)
 
-    # 创建虚拟目标
+    # Create an interface target to hold the communication headers
     add_library(${target} INTERFACE)
 
     # -------------------------------------------------------------
-    ## 处理 ros1 的过程
     macro(ros1)
-        # 执行指定目录的 ros 1 工作空间初始化，并获得 ros 版本名称
+        # Perform ros 1 workspace initialization for the specified directory
+        # and obtains the ros version name
         aoe_execute_process("${__aoe_use_ros_script_root}/init_ros_1_workspace.bash" "${path}"
             RESULT __aoe_use_ros_version_name
         )
 
-        # 设置 catkin 生成目录
+        # Set the catkin generation directory
         set(CATKIN_DEVEL_PREFIX "${CMAKE_BINARY_DIR}/.aoe/${PROJECT_NAME}/ros1/devel")
 
-        # 将生成的头文件目录，记录到接口目标中
+        # Record the generated header file directory into the interface target
         target_include_directories(${target} INTERFACE "${CATKIN_DEVEL_PREFIX}/include")
 
-        # 导入 ros 1
+        # Import ros 1 environment
         list(APPEND CMAKE_PREFIX_PATH "/opt/ros/${__aoe_use_ros_version_name}")
     endmacro()
 
     # -------------------------------------------------------------
-    # 根据 ros 的不同版本，调用相应过程进行处理
+    # Import ros workspace
     if (${version} EQUAL 1)
         ros1()
     else ()
         message(FATAL_ERROR "Unsupported ros version: ${version} !")
     endif ()
 
-    # 将该工作空间挂载到本工程之下
     add_subdirectory("${path}")
 
-    # 恢复 BUILD_SHARED_LIBS 选项
+    # Restore the BUILD_SHARED_LIBS variable
     set(BUILD_SHARED_LIBS ${__aoe_use_ros_at_BUILD_SHARED_LIBS})
 endmacro()

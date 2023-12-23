@@ -10,17 +10,12 @@ cmake_minimum_required(VERSION 3.16)
 # --------------------------------------------------------------------------------------------------------------
 
 function(aoe_include_cmake_files)
-    # 遍历所有目录，取出所有 cmake 文件
-    set(all_files)
-
     foreach(dir ${ARGN})
-        file(GLOB_RECURSE files ${dir}/*.cmake)
-        list(APPEND all_files ${files})
-    endforeach()
+        file(GLOB_RECURSE files "${dir}/*.cmake")
 
-    # include 所有 cmake 文件
-    foreach(cmake_file ${all_files})
-        include(${cmake_file})
+        foreach (cmake_file ${files})
+            include("${cmake_file}")
+        endforeach ()
     endforeach()
 endfunction()
 
@@ -29,7 +24,6 @@ endfunction()
 # The entrypoint of this cmake kit, which loads all tool functions and macros.
 # --------------------------------------------------------------------------------------------------------------
 
-# 加载所有的 cmake 文件
 aoe_include_cmake_files(
     ${CMAKE_CURRENT_LIST_DIR}/utils
     ${CMAKE_CURRENT_LIST_DIR}/collection
@@ -43,6 +37,5 @@ aoe_include_cmake_files(
     ${CMAKE_CURRENT_LIST_DIR}/final
 )
 
-# 设置模板文件目录、脚本文件目录
 __aoe_common_property(TEMPLATE_DIRECTORY_PATH SET "${CMAKE_CURRENT_LIST_DIR}/template")
 __aoe_common_property(SCRIPT_DIRECTORY_PATH   SET "${CMAKE_CURRENT_LIST_DIR}/script")

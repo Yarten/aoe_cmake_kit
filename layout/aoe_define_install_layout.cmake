@@ -36,7 +36,7 @@
 # --------------------------------------------------------------------------------------------------------------
 
 function(aoe_define_install_layout name)
-    # 所有的可配置项及其默认值
+    # All configurable items and their default values
     aoe_list(options APPEND "INCLUDE" ".")
     aoe_list(options APPEND "LIB"     "lib")
     aoe_list(options APPEND "BIN"     "bin")
@@ -44,7 +44,7 @@ function(aoe_define_install_layout name)
 
     aoe_list(options LENGTH options_count)
 
-    # 组装解析参数
+    # Prepare parameters to parse the input arguments
     foreach (i RANGE 1 ${options_count})
         math(EXPR i "${i} - 1")
         aoe_list(options GET ${i} option default_value)
@@ -52,24 +52,22 @@ function(aoe_define_install_layout name)
         list(APPEND value_params ${option})
     endforeach ()
 
-    # 解析输入参数
+    # Parse input arguments
     cmake_parse_arguments(config "" "${value_params}" "" ${ARGN})
     aoe_disable_unknown_params(config)
 
-    # 注册所有选项
+    # Record all items for this new layout
     foreach (i RANGE 1 ${options_count})
         math(EXPR i "${i} - 1")
         aoe_list(options GET ${i} option default_value)
 
-        # 为没有给定值的选项设置默认值
         if (NOT DEFINED config_${option})
             set(config_${option} ${default_value})
         endif ()
 
-        # 记录布局选项
         __aoe_layout_property(${name} INSTALL_${option} SET ${config_${option}})
     endforeach ()
 
-    # 追加本布局名称
+    # Record the new layout's name
     __aoe_project_property(ALL_INSTALL_LAYOUTS APPEND ${name})
 endfunction()

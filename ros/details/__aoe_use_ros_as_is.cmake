@@ -15,26 +15,26 @@
 
 macro(__aoe_use_ros_as_is target version)
     # -------------------------------------------------------------
-    # 用户给定的依赖列表
+    # The given dependencies of this ros package
     set(__aoe_use_ros_depends ${ARGN})
 
-    # ros 的基础依赖
+    # Packages specific to different versions of ros
     set(__aoe_use_ros_1_basic_depends
         roscpp message_generation message_runtime)
 
     set(__aoe_use_ros_2_basic_depends
         ament_cmake ament_index_cpp rclcpp rclcpp_action rosidl_default_generators)
 
-    # 从用户给定的依赖中，删除不同 ros 版本的基础依赖后，再根据当前给定的版本，重新加回来
+    # Ensure that the user's given dependencies do not include these specialized packages,
+    # we will add them back later based on the version of ros
     list(REMOVE_ITEM       __aoe_use_ros_depends ${__aoe_use_ros_1_basic_depends} ${__aoe_use_ros_2_basic_depends})
     list(REMOVE_DUPLICATES __aoe_use_ros_depends)
     list(APPEND            __aoe_use_ros_depends ${__aoe_use_ros_${version}_basic_depends})
 
-    # 创建虚拟目标
+    # Create an interface target to hold the ros dependencies
     add_library(${target} INTERFACE)
 
     # -------------------------------------------------------------
-    ## 处理 ros1 的过程
     macro(ros1)
         find_package(catkin REQUIRED COMPONENTS ${__aoe_use_ros_depends})
 
@@ -69,7 +69,6 @@ macro(__aoe_use_ros_as_is target version)
     endmacro()
 
     # -------------------------------------------------------------
-    ## 处理 ros2 的过程
     macro(ros2)
         foreach(i ${__aoe_use_ros_depends})
             find_package(${i} REQUIRED)
@@ -86,12 +85,10 @@ macro(__aoe_use_ros_as_is target version)
                 ${__aoe_use_ros_message_files} ${__aoe_use_ros_service_files} ${__aoe_use_ros_action_files})
             rosidl_target_interfaces(${target} ${PROJECT_NAME} "rosidl_typesupport_cpp")
         endif ()
-
-        ament_package() # FIXME: 也许得放在 final 中
     endmacro()
 
     # -------------------------------------------------------------
-    # 根据 ros 的不同版本，调用相应过程进行处理
+    # Setup ros package
     if (${version} EQUAL 1)
         ros1()
     elseif (${version} EQUAL 2)
@@ -100,14 +97,14 @@ macro(__aoe_use_ros_as_is target version)
         message(FATAL_ERROR "Unsupported ros version: ${version} !")
     endif ()
 
-    # 删除临时变量
+    # Unset the temporary varibales
     unset(__aoe_use_ros_message_files)
     unset(__aoe_use_ros_service_files)
     unset(__aoe_use_ros_action_files)
 endmacro()
 
 # --------------------------------------------------------------------------------------------------------------
-# 根据 ros 1 的规则，获取指定类型的 ros 通信定义文件
+# Get the ros communication definition files of the specified type according to the rules of ros 1
 # --------------------------------------------------------------------------------------------------------------
 
 function(__aoe_get_ros_1_comm_files result type)
@@ -122,7 +119,7 @@ function(__aoe_get_ros_1_comm_files result type)
 endfunction()
 
 # --------------------------------------------------------------------------------------------------------------
-# 根据 ros 2 的规则，获取指定类型的 ros 通信定义文件
+# Get the ros communication definition files of the specified type according to the rules of ros 2
 # --------------------------------------------------------------------------------------------------------------
 
 function(__aoe_get_ros_2_comm_files result type)

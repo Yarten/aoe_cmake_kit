@@ -46,45 +46,40 @@
 # --------------------------------------------------------------------------------------------------------------
 
 macro(__aoe_property type property)
-    # 解析可选参数
+    # Parse parameters
     __aeo_cmake_parse_nullable_arguments(config "UNSET" "INSTANCE;CHECK_STATUS;GET" "SET;APPEND;REMOVE;CHECK" ${ARGN})
     aoe_disable_unknown_params(config)
-
-    # 只允许执行一种操作
     aoe_expect_one_of_params(config UNSET SET APPEND REMOVE CHECK GET)
-
-    # 若给定了 CHECK 参数，却没有给定 CHECK_STATUS 参数，则报错
     aoe_expect_related_param(config CHECK CHECK_STATUS)
 
-    # 检查该属性是否存在
+    # Check if the given property exists, and if not, an error will be raised
     __aoe_check_property(${type} ${property})
 
-    # 获取属性变量
+    # Get the property's real name and its content
     set(__property_variable __AOE_${type}_PROPERTY_${config_INSTANCE}_${property})
 
-    # 先取出该属性的内容，方便后续流程使用
     get_property(__property_content GLOBAL PROPERTY ${__property_variable})
 
-    # 若给定了 SET 参数，则用相关的值覆盖已有的值
+    # Do set
     if (DEFINED config_SET)
         set(__property_content ${config_SET})
     endif ()
 
-    # 若给定了 APPEND 参数，则向该属性追加新值
+    # Do append
     if (DEFINED config_APPEND)
         list(APPEND __property_content ${config_APPEND})
     endif ()
 
-    # 若给定了 REMOVE 参数，则删除该属性中对应的值
+    # Do item removing
     if (DEFINED config_REMOVE)
         list(REMOVE_ITEM ${__property_content} ${config_REMOVE})
     endif ()
 
-    # 若给定了 CHECK 参数，则查找该属性是否记录指定的值
+    # Do items existence checking
     if (DEFINED config_CHECK)
         set(${config_CHECK_STATUS} True)
 
-        # 遍历所有需要检查的值，逐一查找，只要有一个值不存在，则认为检查失败
+        # Fails if any of the checked items are missing
         foreach (value ${config_CHECK})
             list(FIND __property_content ${value} __property_found_index)
 
@@ -94,21 +89,21 @@ macro(__aoe_property type property)
             endif()
         endforeach ()
 
-        # 输出检查结果
+        # Output the checking result
         aoe_output(${config_CHECK_STATUS})
     endif ()
 
-    # 若设置了 GET 参数，则获取该属性值
+    # Do get
     if (DEFINED config_GET)
         aoe_output(${config_GET} ${__property_content})
     endif ()
 
-    # 若设置了 UNSET 参数，则清空属性值
+    # Do unset
     if (${config_UNSET})
         set(__property_content "")
     endif ()
 
-    # 更新属性值，并删除临时变量
+    # Update the property's content and clear temporary variables
     set_property(GLOBAL PROPERTY ${__property_variable} ${__property_content})
     unset(__property_variable)
     unset(__property_content)

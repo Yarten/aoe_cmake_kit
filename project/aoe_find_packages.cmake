@@ -37,18 +37,20 @@
 # --------------------------------------------------------------------------------------------------------------
 
 function(aoe_find_packages)
-    # 解析第一层参数
+    # Parse the input parameters
     cmake_parse_arguments(config "" "AS" "COMPONENTS" ${ARGN})
     set(packages ${config_UNPARSED_ARGUMENTS})
 
-    # 解析组件参数中的分组参数（按要求导入的第三方库名称作为分组依据）
+    # Parse the COMPONENTS parameters to get the respective components of all third-party libraries
+    # which are separated by the libraries' names
     cmake_parse_arguments(components "" "" "${packages}" ${config_COMPONENTS})
 
     foreach(package ${packages})
         aoe_find_package(${package} COMPONENTS ${components_${package}})
     endforeach()
 
-    # 若指定了 AS 参数，则将所有头文件目录、库文件路径总结在一起输出
+    # If the AS parameter is specified,
+    # all header file directories and library file paths are summarized together in the output variable defined by AS
     if (DEFINED config_AS)
         __aoe_clear_includes_and_libraries(${config_AS})
 

@@ -35,12 +35,12 @@
 # --------------------------------------------------------------------------------------------------------------
 
 function(aoe_add_protobuf target)
-    # 解析参数
+    # Parse parameters
     cmake_parse_arguments(config "NO_DEFAULT_SOURCES;SHARED;STATIC" "" "DEPEND;SOURCE_DIRECTORIES" ${ARGN})
     aoe_disable_unknown_params(config)
     aoe_disable_conflicting_params(config SHARED STATIC)
 
-    # 不允许同名的 protobuf target 重定义
+    # Do not allow protobuf targets with the same name to be redefined.
     __aoe_project_property(PROTOBUF_TARGETS CHECK ${target} CHECK_STATUS is_existed)
 
     if (${is_existed})
@@ -49,7 +49,7 @@ function(aoe_add_protobuf target)
 
     __aoe_project_property(PROTOBUF_TARGETS APPEND ${target})
 
-    # 设置默认源文件目录
+    # Set the default source directories
     if (NOT ${config_NO_DEFAULT_SOURCES})
         __aoe_current_layout_property(TARGET_PROTOS GET default_source_patterns)
 
@@ -59,7 +59,8 @@ function(aoe_add_protobuf target)
         endforeach ()
     endif ()
 
-    # 记录本 protobuf 目标的基本信息，将在 aoe_project_complete() 函数中实现构建
+    # Record basic information about this protobuf target,
+    # which will be used in the aoe_project_complete() function to compile the protobuf files
     __aoe_protobuf_property(${target} SOURCE_DIRECTORIES SET ${config_SOURCE_DIRECTORIES})
     __aoe_protobuf_property(${target} DEPENDENCIES       SET ${config_DEPEND})
 

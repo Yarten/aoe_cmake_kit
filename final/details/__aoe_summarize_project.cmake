@@ -132,6 +132,7 @@ macro(__aoe_summarize_instance_properties type instances extra_target_properties
     foreach (instance ${instances})
         __aoe_write_summary_key_begin(2 ${instance} OFF)
 
+        # -------------------------------------------------------------
         # Write the aoe properties
         foreach (property ${properties})
             __aoe_write_summary_key_begin(3 ${property} ON)
@@ -143,6 +144,7 @@ macro(__aoe_summarize_instance_properties type instances extra_target_properties
             __aoe_write_summary_key_end(3 ${property} ON)
         endforeach ()
 
+        # -------------------------------------------------------------
         # Write the cmake properties (only TARGET properties are supported)
         foreach (property ${extra_target_properties})
             __aoe_write_summary_key_begin(3 ${property} ON)
@@ -319,11 +321,13 @@ macro(__aoe_write_summary_values level values)
 endmacro()
 
 
-macro(__aoe_write_summary_value level value)
+macro(__aoe_write_summary_value level value_)
     set(is_tree_like ON)
     set(str "")
+    set(value "${value_}")
 
     if ("${style}" STREQUAL "xml")
+        __aoe_escape_xml(value)
         set(str "<value>${value}</value>")
 
     elseif ("${style}" STREQUAL "json")
@@ -358,3 +362,26 @@ macro(__aoe_write_summary_separator is_between_values)
 
     string(APPEND out_str "${str}")
 endmacro()
+
+# --------------------------------------------------------------------------------------------------------------
+# Escape special characters in all kinds of formats
+# --------------------------------------------------------------------------------------------------------------
+
+function(__aoe_escape_xml value_var)
+    macro(escape src dst)
+        string(REPLACE "${src}" "${dst}" ${value_var} "${${value_var}}")
+    endmacro()
+
+    escape("&" "&amp;")
+    escape("<" "&lt;")
+    escape(">" "&gt;")
+    escape("\"" "&quot;")
+    escape("'" "&apos;")
+
+    aoe_output(${value_var})
+endfunction()
+
+
+function(__aoe_escape_common value_var)
+    # todo: escape \n \" \\
+endfunction()

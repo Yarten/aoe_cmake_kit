@@ -77,9 +77,9 @@
 function(aoe_add_executable_test target)
     __aoe_parse_target_arguments("" config "NO_DEFAULT_TEST_SOURCES" "CASE" "" ${ARGN})
 
-    # 读取默认源文件
+    # Add the source files in default source directories
     if (NOT ${config_NO_DEFAULT_TEST_SOURCES})
-        # 根据是否给定了 CASE 参数，获取不同原目录的配置。
+        # If CASE is set, a different default option will be used
         if (DEFINED config_CASE)
             set(case ${config_CASE})
             __aoe_current_layout_property(TARGET_TESTS_OF_CASE GET default_test_source_patterns)
@@ -88,14 +88,14 @@ function(aoe_add_executable_test target)
             __aoe_current_layout_property(TARGET_TESTS GET default_test_source_patterns)
         endif ()
 
-        # 获取测试目录下的源码文件
+        # Add the source files
         foreach (pattern ${default_test_source_patterns})
             __aoe_configure(default_test_source ${pattern})
             aoe_source_directories(target_sources ${CMAKE_CURRENT_LIST_DIR}/${default_test_source})
         endforeach ()
     endif ()
 
-    # 若指定该测试目标的名称是一个库目标，则将其也添加到依赖项中（强制链接）
+    # Force link the existed library target that has the same name with this test target
     if (TARGET ${target})
         get_target_property(same_name_target_type ${target} TYPE)
 
@@ -104,7 +104,7 @@ function(aoe_add_executable_test target)
         endif ()
     endif()
 
-    # 重命名该测试目标，并进一步处理它
+    # Rename the test target and begin to create it
     if (DEFINED config_CASE)
         set(target ${target}-TEST-${config_CASE})
     else ()

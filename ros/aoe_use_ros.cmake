@@ -52,14 +52,14 @@
 # --------------------------------------------------------------------------------------------------------------
 
 macro(aoe_use_ros target)
-    # 解析参数
+    # Parse parameters
     cmake_parse_arguments(__aoe_use_ros_config "AS_IS;VERSION_FROM_ENV" "AT;VERSION;VERSION_FROM_ENV_OR" "IMPORT" ${ARGN})
     aoe_disable_unknown_params(__aoe_use_ros_config)
     aoe_expect_one_of_params(__aoe_use_ros_config AS_IS AT)
     aoe_expect_one_of_params(__aoe_use_ros_config VERSION VERSION_FROM_ENV VERSION_FROM_ENV_OR)
     aoe_expect_related_param(__aoe_use_ros_config AS_IS IMPORTS)
 
-    # 获取 ros 版本
+    # Get the ros version
     if (${__aoe_use_ros_config_VERSION_FROM_ENV})
         set(__aoe_use_ros_config_VERSION $ENV{ROS_VERSION})
 
@@ -73,14 +73,14 @@ macro(aoe_use_ros target)
             set(__aoe_use_ros_config_VERSION ${__aoe_use_ros_config_VERSION_FROM_ENV_OR})
         endif ()
     endif ()
-    
-    # 根据参数，选择不同的使用方式
+
+    # Process ros using
     if (${__aoe_use_ros_config_AS_IS})
         __aoe_use_ros_as_is(${target} ${__aoe_use_ros_config_VERSION} ${__aoe_use_ros_config_IMPORT})
     else ()
         __aoe_use_ros_at(${target} ${__aoe_use_ros_config_AT} ${__aoe_use_ros_config_VERSION})
     endif ()
 
-    # 记录使用的 ros 版本
+    # Record the version of ros used
     __aoe_project_property(ROS_VERSION SET ${__aoe_use_ros_config_VERSION})
 endmacro()

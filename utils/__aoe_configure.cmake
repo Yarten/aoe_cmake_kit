@@ -11,27 +11,28 @@
 #       Variable expression, use @xx@ to indicate a context variable that needs to be expanded.
 # --------------------------------------------------------------------------------------------------------------
 
-# 为了本函数的参数的名称、临时变量的名称，与调用处的上下文变量雷同，因此我们加了一些前缀。
+# In order to avoid that the names of the parameters of this function, and the names of the temporary variables,
+# are identical to the context variables at the call, we have added some prefixes.
 function(__aoe_configure __aoe_configure_result __aoe_configure_expr)
-    # 临时的文件路径
+    # Temporary file paths
     set(__aoe_configure_temp_out_file "${CMAKE_BINARY_DIR}/.aoe/${PROJECT_NAME}/__aoe_configure.cmake")
     set(__aoe_configure_temp_in_file  "${__aoe_configure_temp_in_file}.in")
 
-    # 将变量表达式写入到输入文件中
+    # Write variable expressions to the input file
     file(WRITE "${__aoe_configure_temp_in_file}" ${__aoe_configure_expr})
 
-    # 根据上下文变量，替换输入文件中的内容，并输出到输出文件中
+    # Replace the contents of the input file according to the context variables and output it to the output file
     configure_file(
         "${__aoe_configure_temp_in_file}"
         "${__aoe_configure_temp_out_file}"
         @ONLY
     )
 
-    # 将输出文件的内容，读取到结果变量中
+    # Read the contents of the output file into the result variable.
     file(READ "${__aoe_configure_temp_out_file}" __aoe_configure_value)
     string(STRIP ${__aoe_configure_value} __aoe_configure_value)
     aoe_output(${__aoe_configure_result} ${__aoe_configure_value})
 
-    # 删除临时文件
+    # Remove the temporary files
     file(REMOVE "${__aoe_configure_temp_in_file}" "${__aoe_configure_temp_out_file}")
 endfunction()

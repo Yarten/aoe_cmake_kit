@@ -28,7 +28,7 @@
 # --------------------------------------------------------------------------------------------------------------
 
 function(aoe_manifest)
-    # 解析参数。先把 VERSION_NAME_FROM_GIT 当成单值参数。
+    # Parse parameters. Start by treating VERSION_NAME_FROM_GIT as a single-valued parameter.
     cmake_parse_arguments(
         config ""
         "GIT_ROOT;NAME_FROM_GIT;VERSION_FROM_GIT;VERSION_NAME_FROM_GIT;VERSION_NAME"
@@ -41,7 +41,7 @@ function(aoe_manifest)
     aoe_expect_related_param(config VERSION_NAME_FROM_GIT GIT_ROOT)
     aoe_disable_conflicting_params(config VERSION_NAME_FROM_GIT VERSION_NAME)
 
-    # 处理 VERSION_NAME_FROM_GIT 为选项参数的情况
+    # Handle the case where VERSION_NAME_FROM_GIT is an option parameter
     if (DEFINED config_VERSION_NAME_FROM_GIT)
         set(should_read_version_name_from_git ON)
     else ()
@@ -50,10 +50,10 @@ function(aoe_manifest)
         set(should_read_version_name_from_git ${another_config_VERSION_NAME_FROM_GIT})
     endif ()
 
-    # 获取脚本目录
+    # Get script directory
     __aoe_common_property(SCRIPT_DIRECTORY_PATH GET script_directory_path)
 
-    # 处理工程名的读取
+    # Handle the reading of project name
     if (DEFINED config_NAME_FROM_GIT)
         aoe_execute_process(
             "${script_directory_path}/get_project_name_from_git.bash" ${config_GIT_ROOT}
@@ -62,7 +62,7 @@ function(aoe_manifest)
         aoe_output(${config_NAME_FROM_GIT})
     endif ()
 
-    # 处理工程版本的读取
+    # Handle the reading of project version
     if (DEFINED config_VERSION_FROM_GIT)
         aoe_execute_process(
             "${script_directory_path}/get_version_from_git.bash" ${config_GIT_ROOT}
@@ -71,15 +71,15 @@ function(aoe_manifest)
         aoe_output(${config_VERSION_FROM_GIT})
     endif ()
 
-    # 准备从参数中设置版本名称
+    # Prepare to initialize the project version name, which is nullable
     unset(version_name)
 
-    # 处理工程版本名称的设置
+    # Handle the setting of the project version name
     if (DEFINED config_VERSION_NAME)
         set(version_name ${config_VERSION_NAME})
     endif ()
 
-    # 处理工程版本名称的读取
+    # Handle the reading of the project version name
     if (${should_read_version_name_from_git})
         aoe_execute_process(
             "${script_directory_path}/get_version_name_from_git.bash" ${config_GIT_ROOT}
@@ -91,6 +91,6 @@ function(aoe_manifest)
         endif ()
     endif ()
 
-    # 暂存版本名称，将在工程初始化时使用它
+    # Staging the version name, which will be used when the project is initialized
     __aoe_common_property(META_VERSION_NAME SET ${version_name})
 endfunction()

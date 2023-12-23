@@ -20,12 +20,12 @@ function(aoe_install_target target)
     aoe_disable_unknown_params(config)
 
     # -------------------------------------------------------------
-    # 获取当前工作空间定义的安装配置
+    # Get the current used install layout
     __aoe_load_current_install_layout(include lib bin cmake build)
     set(cmake "${cmake}/targets")
 
     # -------------------------------------------------------------
-    # 安装常规目标文件
+    # Configure the installation directories
     install(
         TARGETS ${target} EXPORT ${target}Targets
         LIBRARY  DESTINATION "${lib}"
@@ -35,27 +35,26 @@ function(aoe_install_target target)
     )
 
     # -------------------------------------------------------------
-    # 获取目标的类型
+    # If this target is executable, we stop here.
     get_target_property(target_type ${target} TYPE)
 
-    # 或当前为可执行目标，则不再执行后续的步骤
     if (${target_type} STREQUAL "EXECUTABLE")
         return()
     endif ()
 
     # -------------------------------------------------------------
-    # 追加已经安装的目标列表，将在打包工程时使用
+    # Add this target to the list of installed targets that will be used when install the project
     __aoe_project_property(INSTALLED_LIBRARIES APPEND ${target})
 
     # -------------------------------------------------------------
-    # 获取该目标的一些信息，用于设置安装
+    # Some information about this target for setting up the installation
     __aoe_target_property(${target} EGO_INCLUDES             GET target_ego_includes)
     __aoe_target_property(${target} DEPENDENCIES             GET target_dependencies)
     __aoe_target_property(${target} THIRD_PARTIES            GET target_third_parties)
     __aoe_target_property(${target} THIRD_PARTIES_COMPONENTS GET target_third_parties_components)
 
     # -------------------------------------------------------------
-    # 安装本目标自己的头文件目录
+    # Install this target's own header file directories
     foreach (ego_include ${target_ego_includes})
         if (IS_DIRECTORY "${ego_include}")
             install(
@@ -68,7 +67,7 @@ function(aoe_install_target target)
     endforeach ()
 
     # -------------------------------------------------------------
-    # 导出目标文件
+    # Export the target
     set(target_file       "${target}Targets.cmake")
     set(target_file_path  "${build}/${target_file}")
     set(project_namespace "${PROJECT_NAME}::")
@@ -89,11 +88,11 @@ function(aoe_install_target target)
     )
 
     # -------------------------------------------------------------
-    # 导出自定义的后处理 cmake 文件
+    # Install the custom post-processing cmake files
     aoe_install_cmake(TARGET ${target} POST ${config_EXTRA_CMAKE_POST})
 
     # -------------------------------------------------------------
-    # 生成版本文件
+    # Generate the version configuration file
     if (DEFINED PROJECT_VERSION)
         set(version_file_path "${build}/${target}ConfigVersion.cmake")
 
@@ -107,7 +106,8 @@ function(aoe_install_target target)
     endif ()
 
     # -------------------------------------------------------------
-    # 生成配置文件（定义对工程内其他目标的依赖，以及对第三方库的依赖。）
+    # Generate configuration file
+     # (to define dependencies on other targets within the project, as well as dependencies on third-party libraries).
     set(config_file_path "${build}/${target}Config.cmake")
 
     __aoe_common_property(TEMPLATE_DIRECTORY_PATH GET template_directory_path)
@@ -119,12 +119,12 @@ function(aoe_install_target target)
     )
 
     # -------------------------------------------------------------
-    # 安装版本文件与配置文件
+    # Install the configuration files
     install(
         FILES       ${version_file_path} ${config_file_path}
         DESTINATION ${cmake}
         COMPONENT   Devel
     )
 
-    # 结束安装过程。
+    # END
 endfunction()

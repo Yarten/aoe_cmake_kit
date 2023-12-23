@@ -7,24 +7,13 @@
 # --------------------------------------------------------------------------------------------------------------
 
 function(aoe_add_subdirectories)
-    # 初始化全部目录变量为空
-    unset(all_subdirs)
-
-    # 遍历所有目录，取出所有子目录
     foreach(dir ${ARGN})
-        # 取出指定根目录下所有文件和目录
         file(GLOB subdirs ${dir}/*)
 
-        # 取出目录
         foreach(subdir ${subdirs})
-            if (EXISTS ${subdir}/CMakeLists.txt)
-                list(APPEND all_subdirs ${subdir})
+            if (EXISTS "${subdir}/CMakeLists.txt")
+                add_subdirectory("${subdir}")
             endif ()
         endforeach()
-    endforeach()
-
-    # 包含所有子目录
-    foreach(subdir ${all_subdirs})
-        add_subdirectory(${subdir})
     endforeach()
 endfunction()

@@ -31,13 +31,10 @@ endfunction()
 # --------------------------------------------------------------------------------------------------------------
 
 function(__aoe_register_properties type)
-    # 获取记录该类型属性列表的变量名称
     __aoe_name_of_properties_list(var ${type})
 
-    # 定义该属性
     define_property(GLOBAL PROPERTY ${var})
 
-    # 将剩下的参数去重后，作为该类型属性的值，设置给它
     list(REMOVE_DUPLICATES ARGN)
     set_property(GLOBAL PROPERTY ${var} ${ARGN})
 endfunction()
@@ -57,13 +54,10 @@ endfunction()
 # --------------------------------------------------------------------------------------------------------------
 
 function(__aoe_all_properties result type)
-    # 获取记录该类型属性列表的变量名称
     __aoe_name_of_properties_list(var ${type})
 
-    # 从注册的属性中取出该类别全部属性的条目列表
     get_property(${result} GLOBAL PROPERTY ${var})
 
-    # 输出该结果
     aoe_output(${result})
 endfunction()
 

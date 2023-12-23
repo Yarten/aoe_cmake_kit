@@ -34,7 +34,7 @@
 # --------------------------------------------------------------------------------------------------------------
 
 macro(aoe_project)
-    # 解析参数
+    # Parse parameters
     cmake_parse_arguments(
         __aoe_project_config
         "NAME_FROM_GIT;VERSION_FROM_GIT;VERSION_NAME_FROM_GIT"
@@ -50,7 +50,7 @@ macro(aoe_project)
     aoe_expect_related_param(__aoe_project_config VERSION_FROM_GIT      GIT_ROOT)
     aoe_expect_related_param(__aoe_project_config VERSION_NAME_FROM_GIT GIT_ROOT)
 
-    # 获取工程信息（得确保 version name 在最后处理）
+    # Get project information (make sure the version name is handled last)
     if (${__aoe_project_config_NAME_FROM_GIT})
         aoe_manifest(GIT_ROOT ${__aoe_project_config_GIT_ROOT} NAME_FROM_GIT __aoe_project_config_NAME)
     endif ()
@@ -65,13 +65,13 @@ macro(aoe_project)
         aoe_manifest(VERSION_NAME ${__aoe_project_config_VERSION_NAME})
     endif ()
 
-    # 创建工程
+    # Create project
     if ("${__aoe_project_config_VERSION}" STREQUAL "")
         project(${__aoe_project_config_NAME})
     else ()
         project(${__aoe_project_config_NAME} VERSION ${__aoe_project_config_VERSION})
     endif ()
 
-    # 为该工程，初始化工具箱
+    # Initialize aoe cmake kit for the project
     aoe_project_init(DEFAULT_BUILD_OPTIONS)
 endmacro()

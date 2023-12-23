@@ -28,7 +28,7 @@ macro(__aoe_parse_target_arguments
     unset(__aoe_parse_target_arguments_single_value_parameters)
     unset(__aoe_parse_target_arguments_multi_values_parameters)
 
-    # 设置给定一些目标选项才有的参数
+    # Add parameters that are only available given some of the target options
     cmake_parse_arguments(__aoe_parse_target_arguments_config "LIB;MOD" "" "" ${modes})
 
     if (${__aoe_parse_target_arguments_config_LIB})
@@ -66,7 +66,7 @@ macro(__aoe_parse_target_arguments
         set(${config_variable}_NO_DEFAULT_SOURCES ON)
     endif ()
 
-    # 设置所有目标都拥有的公共参数，并追加补充的参数
+    # Add common parameters that all targets have, together with the additional parameters passed in
     list(APPEND __aoe_parse_target_arguments_optional_parameters
         ${optional_parameters}
         NO_DEFAULT_INCLUDES
@@ -88,7 +88,7 @@ macro(__aoe_parse_target_arguments
         LIBARIES
     )
 
-    # 解析创建目标的函数传入的参数
+    # Parse the parameters passed to the function that creates the target
     list(REMOVE_DUPLICATES __aoe_parse_target_arguments_optional_parameters)
     list(REMOVE_DUPLICATES __aoe_parse_target_arguments_single_value_parameters)
     list(REMOVE_DUPLICATES __aoe_parse_target_arguments_multi_values_parameters)

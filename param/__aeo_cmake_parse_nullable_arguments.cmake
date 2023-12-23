@@ -6,7 +6,7 @@
 macro(__aeo_cmake_parse_nullable_arguments
     param_variable optional_parameters single_value_parameters multi_values_parameters)
 
-    # 解析参数
+    # Parse parameters
     cmake_parse_arguments(
         ${param_variable}
         "${optional_parameters}"
@@ -15,7 +15,7 @@ macro(__aeo_cmake_parse_nullable_arguments
         ${ARGN}
     )
 
-    # 找出空值的参数
+    # Find the parameters without values
     unset(__aeo_cmake_parse_nullable_arguments_null_single_value_parameters)
     unset(__aeo_cmake_parse_nullable_arguments_null_multi_values_parameters)
 
@@ -32,6 +32,7 @@ macro(__aeo_cmake_parse_nullable_arguments
     endforeach ()
 
     # 再次尝试解析这些可能空的值
+    # Try parse again as those empty-valued parameters as optional parameters
     cmake_parse_arguments(
         __aeo_cmake_parse_nullable_arguments_config
         "${__aeo_cmake_parse_nullable_arguments_null_single_value_parameters};${__aeo_cmake_parse_nullable_arguments_null_multi_values_parameters}"
@@ -40,7 +41,7 @@ macro(__aeo_cmake_parse_nullable_arguments
         ${ARGN}
     )
 
-    # 检查这些空值参数是否存在
+    # Check if these null parameters really exist
     foreach (i ${__aeo_cmake_parse_nullable_arguments_null_single_value_parameters})
         if (${__aeo_cmake_parse_nullable_arguments_config_${i}})
             set(${param_variable}_${i})

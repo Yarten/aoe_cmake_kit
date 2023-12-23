@@ -12,7 +12,6 @@
 # --------------------------------------------------------------------------------------------------------------
 
 function(aoe_find_package name)
-    # 解析参数
     cmake_parse_arguments(config "" "" "COMPONENTS" ${ARGN})
     aoe_disable_unknown_params(config)
 
@@ -23,12 +22,10 @@ function(aoe_find_package name)
     endif ()
 
     if (NOT ${${name}_FOUND})
-        # 若 find_package 找不到时，使用 pkg-config 来查找。
         find_package(PkgConfig REQUIRED)
         pkg_check_modules(${name} REQUIRED ${name}) # ${config_COMPONENTS}
     endif ()
 
-    # 规整化该库导出的变量
     __aoe_standardize_includes_and_libraries(${name} "${config_COMPONENTS}")
 endfunction()
 

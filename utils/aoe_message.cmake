@@ -22,19 +22,17 @@
 # --------------------------------------------------------------------------------------------------------------
 
 function(aoe_message tag)
-    # 解析参数，多余的参数将被认为是输出内容
     cmake_parse_arguments(config "TAB;MAYBE_EMPTY" "" "" ${ARGN})
 
-    # 除非有 MAYBE_EMPTY 参数设置，若传入的消息为空，则不打印。
+    # If the content is empty and MAYBE_EMPTY parameter isn't set, we print nothing
     if (${config_MAYBE_EMPTY} OR NOT "${config_UNPARSED_ARGUMENTS}" STREQUAL "")
         set(enable_print ON)
     else()
         set(enable_print OFF)
     endif ()
 
-    # 打印信息
+    # Do print
     if (${enable_print})
-        # 设置打印头
         if (${config_TAB})
             set(head "  ++")
         else()

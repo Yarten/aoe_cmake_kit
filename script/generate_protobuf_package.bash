@@ -1,19 +1,19 @@
 #!/bin/bash
 
-# 第一个参数：protobuf 工程包名称
+# The name of the protobuf target
 name=$1
 
-# 第二个参数：protobuf 工程包的生成根目录
+# The root directory where the protobuf C++ files is generated
 root=$2
 
-# 第三个参数：protoc 使用的源文件目录参数
+# Source file directories used by protoc
 proto_paths=$3
 
-# 第四个参数：protoc 使用的源文件参数
+# The protobuf files used by protoc
 proto_files=$4
 
-# 准备临时生成目录，若生成的结果与已有的结果完全相同时，
-# 将不会更新已有的工程包（即使删掉再生成，可能也会触发重编译）
+# Prepare a temporary generation directory, if the compiled result is identical to the existing files,
+# the existing C++ package will not be updated.
 tmp_root="$root.tmp"
 
 rm    -rf "$tmp_root"
@@ -23,7 +23,7 @@ cd "$tmp_root" || exit 1
 mkdir -p include
 mkdir -p src/"$name"
 
-# 执行 protoc ，将生成目暂时放在 include 目录下
+# Execute protoc, all generated files are now in the 'include' directory
 protoc $proto_paths --cpp_out=./include $proto_files
 
 if [ $? -ne 0 ]; then
@@ -31,7 +31,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# 将生成在头文件同个目录下的所有源文件，拷贝到 src 目录下
+# Move all C++ source files to 'src' directory while keeping their directories structures
 function move_cxx(){
     local header_dir=$1
     local source_dir=$2
@@ -50,8 +50,8 @@ function move_cxx(){
 
 move_cxx include src/"$name"
 
-# 比较生成结果与原有的是否相同，若不同时，再进行更新，
-# 比较前，先删掉在外部创建的 CMakeLists.txt
+# Compare the generated result with the original to see if it is the same, and if it is different, then update it.
+# Delete CMakeLists.txt before comparison
 rm "$root/CMakeLists.txt"
 
 diff -r "$root" "$tmp_root" &> /dev/null

@@ -26,7 +26,7 @@
 # --------------------------------------------------------------------------------------------------------------
 
 function(aoe_project_complete)
-    # 解析参数
+    # Parse parameters
     cmake_parse_arguments(config
         "DEFAULT_EXPORTS_ALL"
         ""
@@ -35,10 +35,10 @@ function(aoe_project_complete)
     )
     aoe_disable_unknown_params(config)
 
-    # 构建全部 protobuf 目标
+    # Build all protobuf targets
     __aoe_build_all_protobuf_targets()
 
-    # 执行工程安装
+    # Generate install() for the project
     unset(is_default_exports_all)
 
     if (${config_DEFAULT_EXPORTS_ALL})
@@ -52,6 +52,10 @@ function(aoe_project_complete)
         MODULE_PATHS ${config_EXPORTED_MODULE_PATHS}
     )
 
-    # 总结本 aoe 工程所有信息，并输出到指定的环境变量指向的文件中（如果指定了的话）
+    # Do some closing work of ros
+    __aoe_ros_package_complete()
+
+    # Summarize all information about this aoe project
+    # and write to the file defined by the specified environment variable (if it is set)
     __aoe_summarize_project()
 endfunction()

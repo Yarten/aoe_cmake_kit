@@ -18,10 +18,8 @@
 # --------------------------------------------------------------------------------------------------------------
 
 function(aoe_execute_process command)
-    # 解析参数，多余的参数都将被认为是外部指令的参数
     cmake_parse_arguments(config "" "RESULT" "" ${ARGN})
 
-    # 执行外部指令
     execute_process(
         COMMAND         ${command} ${config_UNPARSED_ARGUMENTS}
         OUTPUT_VARIABLE result
@@ -29,12 +27,10 @@ function(aoe_execute_process command)
         RESULT_VARIABLE code
     )
 
-    # 若该进程出错，则本函数也报错
     if (NOT ${code} EQUAL 0)
         message(FATAL_ERROR "Error occurs when execute ${command}: ${error}")
     endif ()
 
-    # 若该外部指令执行成功，且设置了输出变量，则将输出传递给指定变量
     if (DEFINED config_RESULT)
         aoe_output(${config_RESULT} ${result})
     endif ()

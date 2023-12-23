@@ -30,17 +30,17 @@
 
 function(__aoe_install_project)
     # -------------------------------------------------------------
-    # 获取当前工作空间定义的安装配置
+    # Get the current used install layout
     __aoe_load_current_install_layout(include lib bin cmake build)
 
     # -------------------------------------------------------------
-    # 解析输入的参数
+    # Parse parameters
     cmake_parse_arguments(config "DEFAULT_ALL;EXPORTED" "" "BASIC;DEFAULT;MODULE_PATHS" ${ARGN})
     aoe_disable_unknown_params(config)
     aoe_disable_conflicting_params(config DEFAULT_ALL DEFAULT)
 
     # -------------------------------------------------------------
-    # 设置工程默认导入的组件，以及必须导入的组件
+    # Set the components that will be used by default and the components that are always used.
     set(basic_libraries ${config_BASIC})
 
     if (${config_DEFAULT_ALL})
@@ -53,15 +53,16 @@ function(__aoe_install_project)
     __aoe_project_property(DEFAULT_EXPORTED_COMPONENTS SET ${default_libraries})
 
     # -------------------------------------------------------------
-    # 处理一起安装的工程内第三方库的配置文件寻找目录
-    # 默认传入的配置文件目录，是相对于安装根目录的；由于该目录的导入，放在了本工程的配置文件中，因此须从
-    # 本工程的配置文件所在目录开始，向前寻找到安装根目录：
+    # Handle the finding paths for configuration files of third-party libraries
+    # within this project that are installed together.
+    # Here calculates the relative path to the installation root for our configuration files,
+    # which helps to find other installed modules.
     file(RELATIVE_PATH relative_install_root "/${cmake}" "/")
 
     set(module_paths "${config_MODULE_PATHS}")
 
     # -------------------------------------------------------------
-    # 生成配置文件（扫描本工程内的其他组件）
+    # Generate the project configuration file, which scans the targets within the project.
     set(config_file_path "${build}/${PROJECT_NAME}Config.cmake")
 
     __aoe_common_property(TEMPLATE_DIRECTORY_PATH GET template_directory_path)
@@ -73,7 +74,7 @@ function(__aoe_install_project)
     )
 
     # -------------------------------------------------------------
-    # 生成版本文件
+    # Generate the project version configuration file.
     if (DEFINED PROJECT_VERSION)
         set(version_file_path "${build}/${PROJECT_NAME}ConfigVersion.cmake")
 
@@ -88,12 +89,12 @@ function(__aoe_install_project)
     endif ()
 
     # -------------------------------------------------------------
-    # 安装配置文件与版本文件
+    # Install the configuration files.
     install(
         FILES       ${config_file_path} ${version_file_path}
         DESTINATION ${cmake}
         COMPONENT   Devel
     )
 
-    # 结束工程安装
+    # End of project's install()
 endfunction()

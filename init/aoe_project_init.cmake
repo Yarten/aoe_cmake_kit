@@ -14,14 +14,14 @@ macro(aoe_project_init)
     cmake_parse_arguments(__aoe_project_init_config "DEFAULT_BUILD_OPTIONS" "" "" ${ARGN})
     aoe_disable_unknown_params(__aoe_project_init_config)
 
-    # 检查工程是否已经创建
+    # Ensure the project() is called
     if ("${PROJECT_NAME}" STREQUAL "")
         message(FATAL_ERROR
             "You should call project() first ! Or directly use aoe_project() which calls this macro correctly !"
         )
     endif ()
 
-    # 记录版本名称
+    # Record the version name as project property
     __aoe_common_property(META_VERSION_NAME GET __aoe_project_init_config_version_name)
 
     if ("${__aoe_project_init_config_version_name}" STREQUAL "")
@@ -34,14 +34,14 @@ macro(aoe_project_init)
         __aoe_project_property(VERSION_NAME SET "${__aoe_project_init_config_version_name}")
     endif ()
 
-    # 预定义一些默认布局
+    # Predefine some default layouts
     aoe_define_install_layout(default)
     aoe_define_target_layout(default)
 
     aoe_use_install_layout(default)
     aoe_use_target_layout(default)
 
-    # 设置一些编译变量
+    # Set some build options for lazy users (well, that is me)
     if (${__aoe_project_init_config_DEFAULT_BUILD_OPTIONS})
         if(NOT CMAKE_C_STANDARD)
             set(CMAKE_C_STANDARD 99)

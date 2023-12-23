@@ -14,10 +14,8 @@
 function(__aoe_check_property type property_name)
     aoe_disable_extra_params()
 
-    # 获取该类别属性的全部条目
     __aoe_all_properties(properties ${type})
 
-    # 检查给定的属性名称是否合法
     list(FIND properties ${property_name} property_name_is_valid)
 
     if (${property_name_is_valid} EQUAL -1)

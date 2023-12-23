@@ -10,11 +10,11 @@
 
 function(__aoe_build_all_protobuf_targets)
     # -------------------------------------------------------------
-    # 获取全部 protobuf 目标
+    # Get all protobuf targets
     __aoe_project_property(PROTOBUF_TARGETS GET all_protobuf_targets)
 
     # -------------------------------------------------------------
-    # 扫描全部 protobuf 目标，整合他们的目录，将用于 protoc
+    # Scan all protobuf targets and collect their source directories that will be used for protoc
     set(proto_paths "")
 
     foreach(target ${all_protobuf_targets})
@@ -26,10 +26,11 @@ function(__aoe_build_all_protobuf_targets)
     endforeach()
 
     # -------------------------------------------------------------
-    # 遍历所有 protobuf 目标，进行逐一的 protobuf 编译生成
+    # Iterate over all protobuf targets and compile them one by one
     foreach(target ${all_protobuf_targets})
         # -------------------------------------------------------------
-        # 整合该目标的全部依赖，同时检查这些依赖是否存在
+        # Collect the dependencies of this target, while checking if they exist,
+        # ${proto_dependencies} will be used in the target's CMakeLists.txt.
         set(proto_dependencies "")
 
         __aoe_protobuf_property(${target} DEPENDENCIES GET dependencies)
@@ -45,7 +46,8 @@ function(__aoe_build_all_protobuf_targets)
         endforeach()
 
         # -------------------------------------------------------------
-        # 遍历该目标的全部源文件目录，取出所有的源文件，组合为执行参数的一部分
+        # Iterate through the entire directory of source files for this target,
+        # take out all the source files and combine them as part of the execution parameters
         set(proto_files "")
 
         __aoe_protobuf_property(${target} SOURCE_DIRECTORIES GET source_directories)
@@ -58,11 +60,11 @@ function(__aoe_build_all_protobuf_targets)
         endforeach()
 
         # -------------------------------------------------------------
-        # 准备该目标的根目录，用于代码生成
+        # Prepare the root directory of this target for code generation
         set(target_root "${CMAKE_BINARY_DIR}/.aoe/${PROJECT_NAME}/protobuf-targets/${target}")
 
         # -------------------------------------------------------------
-        # 执行 protoc 脚本
+        # Execute the protoc script
         __aoe_common_property(SCRIPT_DIRECTORY_PATH GET script_directory_path)
 
         aoe_execute_process(
@@ -71,7 +73,7 @@ function(__aoe_build_all_protobuf_targets)
         )
 
         # -------------------------------------------------------------
-        # 设置该目标编译为动态库的选项
+        # Set the option for compiling this target as a dynamic library or not
         __aoe_protobuf_property(${target} SHARED GET is_shared)
 
         if (${is_shared})
@@ -81,7 +83,7 @@ function(__aoe_build_all_protobuf_targets)
         endif ()
 
         # -------------------------------------------------------------
-        # 在创建出来的库目标目录下，创建 CMakeLists.txt
+        # Create CMakeLists.txt in the directory of the created library target
         __aoe_common_property(TEMPLATE_DIRECTORY_PATH GET template_directory_path)
 
         configure_file(
@@ -91,11 +93,11 @@ function(__aoe_build_all_protobuf_targets)
         )
 
         # -------------------------------------------------------------
-        # 添加该目录到构建树中
+        # Add the directory to the build tree
         add_subdirectory("${target_root}" "${target_root}.out")
 
-        # 完成本目标的生成过程。
+        # Complete the generation process for this protobuf target
     endforeach()
 
-    # 完成全部 protobuf 目标的生成过程
+    # Complete the process of generating all protobuf targets
 endfunction()

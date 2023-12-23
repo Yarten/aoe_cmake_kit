@@ -6,7 +6,7 @@
 
 macro(__aoe_add_target type)
     # -------------------------------------------------------------
-    # 追加模块默认源文件目录
+    # Add source files in the module's default source directories
     if (NOT ${config_NO_DEFAULT_SOURCES})
         __aoe_current_layout_property(TARGET_SOURCES GET default_source_patterns)
 
@@ -17,25 +17,26 @@ macro(__aoe_add_target type)
     endif ()
 
     # -------------------------------------------------------------
-    # 追加传入的源文件，以及给定源文件目录下的所有源文件
+    # Add the given source files and source files in the given source directories
     aoe_source_directories(target_sources ${config_SOURCE_DIRECTORIES})
     list(APPEND target_sources ${config_SOURCES})
 
     # -------------------------------------------------------------
-    # 处理 AUX 参数
+    # If AUX is set, use an empty source file as the unique source file input.
     if (${config_AUX})
         __aoe_common_property(TEMPLATE_DIRECTORY_PATH GET template_directory_path)
         set(target_sources "${template_directory_path}/empty.cpp")
     endif ()
 
     # -------------------------------------------------------------
-    # 如果没有给定源码，将处于接口模式。（可执行目标无效）
+    # If no source file is given, it will be in interface mode. (Invalid for executable target)
     if ("${target_sources}" STREQUAL "")
         set(is_interface ON)
     else ()
         set(is_interface OFF)
     endif ()
 
+    # -------------------------------------------------------------
     macro(this_target_include_directories is_private items)
         if (${is_interface})
             set(option "INTERFACE")
@@ -47,10 +48,11 @@ macro(__aoe_add_target type)
 
         foreach (dir ${items})
             if ("${dir}" MATCHES "^\\$<.*>$")
-                # 传入的是生成表达式，则只能直接使用它
+                # Can only use it directly if it is a generation expression
                 target_include_directories(${target} ${option} "${dir}")
             else ()
-                # 若传入的头文件目录在本模块目录下，则记录为本模块自己的头文件目录，并将安装它
+                # If the incoming header file directory is in the module's directory,
+                # it is recorded as the module's own header file directory and it will be installed.
                 get_filename_component(full_path "${dir}" ABSOLUTE BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
                 file(RELATIVE_PATH relative_path "${CMAKE_CURRENT_SOURCE_DIR}" "${full_path}")
 
@@ -67,7 +69,8 @@ macro(__aoe_add_target type)
         endforeach ()
     endmacro()
 
-    macro(this_target_link_directories is_private items)
+    # -------------------------------------------------------------
+    macro(this_target_link_libraries is_private items)
         if (${is_interface})
             set(option "INTERFACE")
         elseif (${is_private})
@@ -80,18 +83,18 @@ macro(__aoe_add_target type)
     endmacro()
 
     # -------------------------------------------------------------
-    # 创建目标
+    # Create the target
     aoe_message("TARGET" ${target})
     __aoe_project_property(TARGETS APPEND ${target})
 
     if ("${type}" STREQUAL "executable")
-        # 创建为可执行目标
+        # .. as executable target
         add_executable(${target} ${target_sources})
         set(target_output_name ${target})
     elseif ("${type}" STREQUAL "library")
-        # 创建为库目标
+        # .. as library target
         if (${is_interface})
-            # 无源码时，自动创建为接口库目标
+            # Automatically created as an interface library target when no source file is available
             add_library(${target} INTERFACE)
             aoe_message("INTERFACE" TAB MAYBE_EMPTY)
         else ()
@@ -112,13 +115,13 @@ macro(__aoe_add_target type)
             endif ()
         endif ()
 
-        # 设置库的输出名字，需要加上命名空间（与组名），以防止被其他工程导入使用时，出现同名冲突
+        # Set the library output name in order to prevent the same name conflict when imported by other projects.
         set(target_output_name ${PROJECT_NAME}_${target})
     else ()
         message(FATAL_ERROR "unknown target type (internal error): ${type}")
     endif ()
 
-    # 设置编译结果的输出名称
+    # Set the output name
     if (NOT ${is_interface})
         if (DEFINED config_ALIAS)
             set(target_output_name ${config_ALIAS})
@@ -129,7 +132,7 @@ macro(__aoe_add_target type)
     endif ()
 
     # -------------------------------------------------------------
-    # 设置默认头文件目录，同时，也记录为本目标自己的头文件目录
+    # Set the default header file directories and also records them as the target's own.
     if (NOT ${config_NO_DEFAULT_INCLUDES})
         __aoe_current_layout_property(TARGET_INCLUDES GET default_include_patterns)
 
@@ -140,43 +143,43 @@ macro(__aoe_add_target type)
     endif ()
 
     # -------------------------------------------------------------
-    # 设置依赖的其他本工程内的库目标
+    # Set dependencies on other library targets within the project
     aoe_message("DEPEND"         TAB ${config_DEPEND})
     aoe_message("PRIVATE DEPEND" TAB ${config_PRIVATE_DEPEND})
     aoe_message("FORCE DEPEND"   TAB ${config_FORCE_DEPEND})
     aoe_message("BUILD DEPEND"   TAB ${config_BUILD_DEPEND})
 
-    # 记录库依赖，将在 install 时导出
+    # Record library dependencies that will be exported at install time
     __aoe_target_property(${target} DEPENDENCIES SET ${config_DEPEND} ${config_PRIVATE_DEPEND} ${config_FORCE_DEPEND})
 
-    # 设置编译顺序的依赖
+    # Set the build order dependencies
     set(build_depends ${config_DEPEND} ${config_PRIVATE_DEPEND} ${config_FORCE_DEPEND} ${config_BUILD_DEPEND})
 
     if (NOT "${build_depends}" STREQUAL "")
         add_dependencies(${target} ${build_depends})
     endif ()
 
-    # 设置链接库
-    this_target_link_directories(OFF "${config_DEPEND}")
-    this_target_link_directories(ON  "${config_PRIVATE_DEPEND}")
+    # Set the libraries to be linked
+    this_target_link_libraries(OFF "${config_DEPEND}")
+    this_target_link_libraries(ON  "${config_PRIVATE_DEPEND}")
 
-    # 处理强制链接
+    # Handle the forced links
     list(REMOVE_DUPLICATES config_FORCE_DEPEND)
 
     if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
         foreach (depend ${config_FORCE_DEPEND})
-            this_target_link_directories(ON "-Wl,-force-load,${depend}")
+            this_target_link_libraries(ON "-Wl,-force-load,${depend}")
         endforeach ()
     elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         if (NOT "${config_FORCE_DEPEND}" STREQUAL "")
-            this_target_link_directories(ON "-Wl,--whole-archive;${config_FORCE_DEPEND};-Wl,--no-whole-archive")
+            this_target_link_libraries(ON "-Wl,--whole-archive;${config_FORCE_DEPEND};-Wl,--no-whole-archive")
         endif ()
     else ()
         message(FATAL_ERROR "CANNOT use FORCE_DEPEND with unsupported compiler ${CMAKE_CXX_COMPILER_ID} !")
     endif ()
 
     # -------------------------------------------------------------
-    # 导入第三方库
+    # Import the third-party libraries
     aoe_message("IMPORT"               TAB ${config_IMPORT})
     aoe_message("PRIVATE IMPORT"       TAB ${config_PRIVATE_IMPORT})
 
@@ -189,19 +192,19 @@ macro(__aoe_add_target type)
     this_target_include_directories(OFF "${imported_INCLUDE_DIRS}")
     this_target_include_directories(ON  "${private_imported_INCLUDE_DIRS}")
 
-    this_target_link_directories(OFF "${imported_LIBRARIES}")
-    this_target_link_directories(ON  "${private_imported_LIBRARIES}")
+    this_target_link_libraries(OFF "${imported_LIBRARIES}")
+    this_target_link_libraries(ON  "${private_imported_LIBRARIES}")
 
     # -------------------------------------------------------------
-    # 设置给定的头文件目录与库目录
+    # Set the given header file directories and linked libraries
     this_target_include_directories(OFF "${config_INCLUDES}")
     this_target_include_directories(ON  "${config_PRIVATE_INCLUDES}")
 
-    this_target_link_directories(OFF "${config_LIBARIES}")
-    this_target_link_directories(ON  "${config_PRIVATE_LIBRARIES}")
+    this_target_link_libraries(OFF "${config_LIBARIES}")
+    this_target_link_libraries(ON  "${config_PRIVATE_LIBRARIES}")
 
     # -------------------------------------------------------------
-    # 配置 install
+    # Config install() for this target
     if (NOT ${config_NO_INSTALL})
         aoe_install_target(${target})
     else ()
