@@ -41,6 +41,10 @@ function(aoe_manifest)
     aoe_expect_related_param(config VERSION_NAME_FROM_GIT GIT_ROOT)
     aoe_disable_conflicting_params(config VERSION_NAME_FROM_GIT VERSION_NAME)
 
+    if (DEFINED config_GIT_ROOT)
+        get_filename_component(config_GIT_ROOT "${config_GIT_ROOT}" ABSOLUTE)
+    endif ()
+
     # Handle the case where VERSION_NAME_FROM_GIT is an option parameter
     if (DEFINED config_VERSION_NAME_FROM_GIT)
         set(should_read_version_name_from_git ON)
