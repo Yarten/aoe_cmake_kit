@@ -33,7 +33,7 @@ endfunction()
 function(__aoe_register_properties type)
     __aoe_name_of_properties_list(var ${type})
 
-    define_property(GLOBAL PROPERTY ${var} BRIEF_DOCS "aoe property ${type}")
+    define_property(GLOBAL PROPERTY ${var} BRIEF_DOCS "aoe property ${type}" FULL_DOCS "aoe property ${type}")
 
     list(REMOVE_DUPLICATES ARGN)
     set_property(GLOBAL PROPERTY ${var} ${ARGN})
