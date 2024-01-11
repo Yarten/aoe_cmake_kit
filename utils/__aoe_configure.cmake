@@ -16,7 +16,7 @@
 function(__aoe_configure __aoe_configure_result __aoe_configure_expr)
     # Temporary file paths
     set(__aoe_configure_temp_out_file "${CMAKE_BINARY_DIR}/.aoe/${PROJECT_NAME}/__aoe_configure.cmake")
-    set(__aoe_configure_temp_in_file  "${__aoe_configure_temp_in_file}.in")
+    set(__aoe_configure_temp_in_file  "${__aoe_configure_temp_out_file}.in")
 
     # Write variable expressions to the input file
     file(WRITE "${__aoe_configure_temp_in_file}" ${__aoe_configure_expr})

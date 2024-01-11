@@ -7,7 +7,7 @@ Just some cmake tools for lazy people like me :)
 Examples and docs (not yet) can be found at [aoe cmake kit tutorial](https://github.com/Yarten/aoe_cmake_kit_tutorial).
 
 
-## Interesting Points
+## Features
 
 - [x] Easy to use
 - [x] Wrap install() for targets

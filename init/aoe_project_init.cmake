@@ -52,10 +52,10 @@ macro(aoe_project_init)
         endif()
 
         if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fconcepts -Werror=return-type -Wall -Wno-pedantic -Wno-missing-field-initializers -pthread -fopenmp -fPIC")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Werror=return-type -Wall -Wno-pedantic -Wno-missing-field-initializers -pthread -fPIC")
         else()
             set(CMAKE_BUILD_TYPE "Release")
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -fconcepts -Werror=return-type -Wall -Wno-pedantic -Wno-missing-field-initializers -pthread -fopenmp -fPIC")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Werror=return-type -Wall -Wno-pedantic -Wno-missing-field-initializers -pthread -fPIC")
         endif()
 
         message("Build Type: " ${CMAKE_BUILD_TYPE} ${CMAKE_CXX_FLAGS})

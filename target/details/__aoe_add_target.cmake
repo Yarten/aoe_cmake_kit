@@ -166,16 +166,8 @@ macro(__aoe_add_target type)
     # Handle the forced links
     list(REMOVE_DUPLICATES config_FORCE_DEPEND)
 
-    if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-        foreach (depend ${config_FORCE_DEPEND})
-            this_target_link_libraries(ON "-Wl,-force-load,${depend}")
-        endforeach ()
-    elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-        if (NOT "${config_FORCE_DEPEND}" STREQUAL "")
-            this_target_link_libraries(ON "-Wl,--whole-archive;${config_FORCE_DEPEND};-Wl,--no-whole-archive")
-        endif ()
-    else ()
-        message(FATAL_ERROR "CANNOT use FORCE_DEPEND with unsupported compiler ${CMAKE_CXX_COMPILER_ID} !")
+    if (NOT "${config_FORCE_DEPEND}" STREQUAL "")
+        this_target_link_libraries(ON "-Wl,--whole-archive;${config_FORCE_DEPEND};-Wl,--no-whole-archive")
     endif ()
 
     # -------------------------------------------------------------
