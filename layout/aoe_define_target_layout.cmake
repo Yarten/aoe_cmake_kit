@@ -4,16 +4,24 @@
 # including source file directories, header file directories, etc.
 # --------------------------------------------------------------------------------------------------------------
 # aoe_define_target_layout(name
-#   [INCLUDES      <relative path> ...]
-#   [SOURCES       <relative path> ...]
-#   [PROTOS        <relative path> ...]
-#   [TESTS         <relative path> ...]
-#   [TESTS_OF_CASE <relative path> ...]
+#   [INCLUDES              <relative path> ...]
+#   [SOURCES               <relative path> ...]
+#   [PROTOS                <relative path> ...]
+#   [TESTS                 <relative path> ...]
+#   [TESTS_OF_CASE         <relative path> ...]
+#   [TEST_FILES            <relative path> ...]
+#   [TEST_FILES_OF_CASE    <relative path> ...]
+#   [EXAMPLE_FILES         <relative path> ...]
+#   [EXAMPLE_FILES_OF_CASE <relative path> ...]
 #   [NO_DEFAULT_INCLUDES]
 #   [NO_DEFAULT_SOURCES]
 #   [NO_DEFAULT_PROTOS]
 #   [NO_DEFAULT_TESTS]
 #   [NO_DEFAULT_TESTS_OF_CASE]
+#   [NO_DEFAULT_TEST_FILES]
+#   [NO_DEFAULT_TEST_FILES_OF_CASE]
+#   [NO_DEFAULT_EXAMPLE_FILES]
+#   [NO_DEFAULT_EXAMPLE_FILES_OF_CASE]
 # )
 #
 # name: 本 aoe target 目录结构的名称。
@@ -24,19 +32,34 @@
 #      where the CMakeLists.txt file defining the target is located.
 # --------------------------------------------------------------------------------------------------------------
 # INCLUDES: 头文件目录。
-#           Directories of header files.
+#           Directories of header files. Used by aoe_add_library() and aoe_add_executable().
 #
 # SOURCES: 源文件目录。
-#          Directories of source files.
+#          Directories of source files. Used by aoe_add_library() and aoe_add_executable().
 #
 # PROTOS: protobuf 文件目录。
-#         Directories of protobuf files.
+#         Directories of protobuf files. Used by aoe_add_protobuf()
 #
 # TESTS: 测试 target 的源文件目录。
-#        The source directories of the test target.
+#        The source directories of the test target. Used by aoe_add_executable_test()
 #
 # TESTS_OF_CASE: 指定了 CASE 参数的测试 target 的源文件目录。
 #                The source directories of the test target for which the CASE parameter is specified.
+#                Used by aoe_add_executable_test()
+#
+# TEST_FILES: 测试 target 的源文件列表。
+#             The source files of the test target. Used by aoe_add_test().
+#
+# TEST_FILES_OF_CASE: 指定了 CASE 参数的测试 target 的源文件列表。
+#                     The source files of the test target for which the CASE parameter is specified.
+#                     Used by aoe_add_test().
+#
+# EXAMPLE_FILES: 例子 target 的源文件列表。
+#                The source files of the example target. Used by aoe_add_example().
+#
+# EXAMPLE_FILES_OF_CASE: 指定了 CASE 参数的例子 target 的源文件列表。
+#                        The source files of the example target for which the CASE parameter is specified.
+#                        Used by aoe_add_example().
 # --------------------------------------------------------------------------------------------------------------
 # 可用的上下文变量 (Available context variables):
 #   @target@: 目标的名称。
@@ -56,6 +79,10 @@ function(aoe_define_target_layout name)
     aoe_list(options APPEND "PROTOS"        "proto/@target@")
     aoe_list(options APPEND "TESTS"         "test/@target@")
     aoe_list(options APPEND "TESTS_OF_CASE" "test/@target@-@case@")
+    aoe_list(options APPEND "TEST_FILES"            "test/@target@.cpp")
+    aoe_list(options APPEND "TEST_FILES_OF_CASE"    "test/@target@-@case@.cpp")
+    aoe_list(options APPEND "EXAMPLE_FILES"         "example/@target@.cpp")
+    aoe_list(options APPEND "EXAMPLE_FILES_OF_CASE" "example/@target@-@case@.cpp")
 
     aoe_list(options LENGTH options_count)
 

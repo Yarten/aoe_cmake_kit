@@ -3,7 +3,7 @@
 # Create an executable test target.
 # If a library target with the same name exists, it will FORCE_DEPEND on it.
 # --------------------------------------------------------------------------------------------------------------
-# aoe_add_executable_test(target
+# aoe_add_test(target
 #   [CASE <case name>]
 #
 #   [DEPEND       <other library target> ...]
@@ -60,11 +60,11 @@
 # SOURCES: 为本目标导入源文件。
 #          Import source files for this target.
 #
-# SOURCE_DIRECTORIES: 为本目标导入指定测试源文件目录下的所有源文件。
-#                     Import all source files in the specified testing source file directories for this target.
+# SOURCE_DIRECTORIES: 为本目标导入指定源文件目录下的所有源文件。
+#                     Import all source files in the specified source file directories for this target.
 #
-# NO_DEFAULT_SOURCES: 设置不要导入默认源文件目录下的源文件。
-#                     Set not to import source files from the default source files directories.
+# NO_DEFAULT_SOURCES: 设置不要导入默认源文件。
+#                     Set not to import the default source file.
 #
 # AUX: 标识该可执行目标没有源文件。一般需要与 FORCE_DEPEND 参数配合。
 #      Identifies that this executable target has no source files.
@@ -74,24 +74,28 @@
 #           Import libraries for this target.
 # --------------------------------------------------------------------------------------------------------------
 
-function(aoe_add_executable_test target)
+function(aoe_add_test target)
     __aoe_parse_target_arguments("" config "NO_DEFAULT_SOURCES" "CASE" "" ${ARGN})
 
-    # Add the source files in default source directories
+    # Add the default source files
     if (NOT ${config_NO_DEFAULT_SOURCES})
         # If CASE is set, a different default option will be used
         if (DEFINED config_CASE)
             set(case ${config_CASE})
-            __aoe_current_layout_property(TARGET_TESTS_OF_CASE GET default_test_source_patterns)
+            __aoe_current_layout_property(TARGET_TEST_FILES_OF_CASE GET default_test_file_patterns)
         else ()
             unset(case)
-            __aoe_current_layout_property(TARGET_TESTS GET default_test_source_patterns)
+            __aoe_current_layout_property(TARGET_TEST_FILES GET default_test_file_patterns)
         endif ()
 
-        # Add the source files
-        foreach (pattern ${default_test_source_patterns})
-            __aoe_configure(default_test_source ${pattern})
-            aoe_source_directories(target_sources ${CMAKE_CURRENT_LIST_DIR}/${default_test_source})
+        # Add the existed source files
+        foreach (pattern ${default_test_file_patterns})
+            __aoe_configure(default_test_file ${pattern})
+            set(default_test_file "${CMAKE_CURRENT_LIST_DIR}/${default_test_file}")
+
+            if (EXISTS ${default_test_file})
+                list(APPEND target_sources ${default_test_file})
+            endif ()
         endforeach ()
     endif ()
 

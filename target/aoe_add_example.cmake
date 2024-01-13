@@ -1,9 +1,9 @@
 # --------------------------------------------------------------------------------------------------------------
-# 创建一个可执行的测试目标。若刚好存在同名的库目标，将会强制依赖它。
-# Create an executable test target.
+# 创建一个可执行的例子目标。若刚好存在同名的库目标，将会强制依赖它。
+# Create an executable example target.
 # If a library target with the same name exists, it will FORCE_DEPEND on it.
 # --------------------------------------------------------------------------------------------------------------
-# aoe_add_executable_test(target
+# aoe_add_example(target
 #   [CASE <case name>]
 #
 #   [DEPEND       <other library target> ...]
@@ -25,7 +25,7 @@
 # )
 # --------------------------------------------------------------------------------------------------------------
 # CASE: 给本测试目标设置的测试样例名称。
-#       The name of the test case set for this test target.
+#       The name of the example case set for this example target.
 #
 # DEPEND: 本目标依赖的工程内的其他库目标，将自动导入它们的头文件目录与库文件。
 #         Other library targets within the project that this target depends on,
@@ -60,11 +60,11 @@
 # SOURCES: 为本目标导入源文件。
 #          Import source files for this target.
 #
-# SOURCE_DIRECTORIES: 为本目标导入指定测试源文件目录下的所有源文件。
-#                     Import all source files in the specified testing source file directories for this target.
+# SOURCE_DIRECTORIES: 为本目标导入指定源文件目录下的所有源文件。
+#                     Import all source files in the specified source file directories for this target.
 #
-# NO_DEFAULT_SOURCES: 设置不要导入默认源文件目录下的源文件。
-#                     Set not to import source files from the default source files directories.
+# NO_DEFAULT_SOURCES: 设置不要导入默认源文件。
+#                     Set not to import the default source file.
 #
 # AUX: 标识该可执行目标没有源文件。一般需要与 FORCE_DEPEND 参数配合。
 #      Identifies that this executable target has no source files.
@@ -74,26 +74,47 @@
 #           Import libraries for this target.
 # --------------------------------------------------------------------------------------------------------------
 
-function(aoe_add_executable_test target)
+function(aoe_add_example target)
     __aoe_parse_target_arguments("" config "NO_DEFAULT_SOURCES" "CASE" "" ${ARGN})
 
-    # Add the source files in default source directories
+    # Add the default source files
     if (NOT ${config_NO_DEFAULT_SOURCES})
         # If CASE is set, a different default option will be used
         if (DEFINED config_CASE)
             set(case ${config_CASE})
-            __aoe_current_layout_property(TARGET_TESTS_OF_CASE GET default_test_source_patterns)
+            __aoe_current_layout_property(TARGET_EXAMPLE_FILES_OF_CASE GET default_example_file_patterns)
         else ()
             unset(case)
-            __aoe_current_layout_property(TARGET_TESTS GET default_test_source_patterns)
+            __aoe_current_layout_property(TARGET_EXAMPLE_FILES GET default_example_file_patterns)
         endif ()
 
-        # Add the source files
-        foreach (pattern ${default_test_source_patterns})
-            __aoe_configure(default_test_source ${pattern})
-            aoe_source_directories(target_sources ${CMAKE_CURRENT_LIST_DIR}/${default_test_source})
+        # Add the existed source files
+        foreach (pattern ${default_example_file_patterns})
+            __aoe_configure(default_example_file ${pattern})
+            set(default_example_file "${CMAKE_CURRENT_LIST_DIR}/${default_example_file}")
+
+            if (EXISTS ${default_example_file})
+                list(APPEND target_sources ${default_example_file})
+            endif ()
         endforeach ()
     endif ()
 
-    __aoe_add_test_target()
+    # Force link the existed library target that has the same name with this example target
+    if (TARGET ${target})
+        get_target_property(same_name_target_type ${target} TYPE)
+
+        if (NOT "${same_name_target_type}" STREQUAL "EXECUTABLE")
+            list(APPEND config_FORCE_DEPEND ${target})
+        endif ()
+    endif()
+
+    # Rename the example target and begin to create it
+    if (DEFINED config_CASE)
+        set(target ${target}-EXAMPLE-${config_CASE})
+    else ()
+        set(target ${target}-EXAMPLE)
+    endif ()
+
+    __aoe_project_property(EXAMPLE_TARGETS APPEND ${target})
+    __aoe_add_target("executable")
 endfunction()
