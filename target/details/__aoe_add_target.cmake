@@ -168,7 +168,7 @@ macro(__aoe_add_target type)
 
     if (NOT "${config_FORCE_DEPEND}" STREQUAL "")
         if(APPLE)
-            this_target_link_libraries(ON "-Wl,--force_load;${config_FORCE_DEPEND}")
+            this_target_link_libraries(ON "-Wl,-force_load;${config_FORCE_DEPEND}")
         else()
             this_target_link_libraries(ON "-Wl,--whole-archive;${config_FORCE_DEPEND};-Wl,--no-whole-archive")
         endif()
