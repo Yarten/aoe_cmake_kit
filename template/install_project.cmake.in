@@ -132,8 +132,8 @@ endforeach()
 # -------------------------------------------------------------
 ## 复原 cmake 变量
 
-set(CMAKE_PREFIX_PATH _@PROJECT_NAME@_CMAKE_PREFIX_PATH_old)
-set(CMAKE_MODULE_PATH _@PROJECT_NAME@_CMAKE_MODULE_PATH_old)
+set(CMAKE_PREFIX_PATH ${_@PROJECT_NAME@_CMAKE_PREFIX_PATH_old})
+set(CMAKE_MODULE_PATH ${_@PROJECT_NAME@_CMAKE_MODULE_PATH_old})
 
 # -------------------------------------------------------------
 ## 处理最后的查询结果
